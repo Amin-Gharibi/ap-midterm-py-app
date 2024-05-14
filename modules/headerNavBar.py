@@ -34,3 +34,6 @@ class HeaderNavBar(ctk.CTkFrame):
         self.goToArticlesButton.pack(side=tk.RIGHT,
                                      padx=0, pady=20,
                                      anchor='n')
+
+    def get_fg_color(self):
+        return self.cget('fg_color')

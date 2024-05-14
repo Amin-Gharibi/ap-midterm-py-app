@@ -1,6 +1,5 @@
 import customtkinter as ctk
-import tkinter as tk
-from modules.headerNavBar import HeaderNavBar
+from mainScrollableFrame import ScrollableFrame
 
 # app width and height
 APP_WIDTH = 1200
@@ -24,9 +23,11 @@ class App(ctk.CTk):
 
         # config the column that the header navbar is in it
         self.grid_columnconfigure(0, weight=1)
-        # define the header navbar
-        header_navbar = HeaderNavBar(master=self)
-        header_navbar.grid(row=0, column=0, padx=10, pady=10, sticky='ew')
+        self.grid_rowconfigure(0, weight=1)
+
+        # contents must scroll, so they all are in the main scrollable frame
+        contents_container = ScrollableFrame(master=self)
+        contents_container.grid(row=0, column=0, sticky="nsew")
 
 
 if __name__ == "__main__":
