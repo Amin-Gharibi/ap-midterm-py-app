@@ -20,8 +20,14 @@ class ItemBox(tk.Frame):
         title_label = ctk.CTkLabel(self, text=title, fg_color=target_fg_color[1], font=("Arial", 14))
         title_label.grid(row=2, column=0, padx=10, sticky="w")
 
+        # artists item box doesn't have a description, so its height must be 0
+        if len(description):
+            description_label_height = 80
+        else:
+            description_label_height = 0
+
         # description label
-        description_label = ctk.CTkLabel(self, text=description, fg_color=target_fg_color[1], font=("Arial", 12), text_color='gray', height=80)
+        description_label = ctk.CTkLabel(self, text=description, fg_color=target_fg_color[1], font=("Arial", 12), text_color='gray', height=description_label_height)
         description_label.grid(row=3, column=0, padx=15, sticky='w')
 
         # rate label

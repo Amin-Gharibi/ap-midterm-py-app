@@ -78,5 +78,44 @@ class ScrollableFrame(ctk.CTkScrollableFrame):
 
         # create latest movies section
         latest_movies_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
+                                                     title='Latest Movies',
                                                      items=movies_details)
         latest_movies_container.grid(row=2, column=0, sticky='ew')
+
+        # create latest articles section
+        latest_articles_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
+                                                       title='Latest Articles',
+                                                       items=movies_details[:4])
+        latest_articles_container.grid(row=3, column=0, sticky='ew')
+
+        artists_details = [
+            {
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            }
+        ]
+
+        top_artists_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
+                                                   title='Top Artists',
+                                                   items=artists_details)
+        top_artists_container.grid(row=4, column=0, sticky='ew')
