@@ -41,23 +41,25 @@ class HeaderNavBar(ctk.CTkFrame):
                                      anchor='n')
 
     def on_btn_click_handler(self):
-        from logInSignUpPage import LogInSignUpPage
+        from modules.loginForm import LoginForm
 
-        # destroy current page
-        self.master.master.destroy()
+        # destroy current contents
+        for widget in self.master.master.winfo_children():
+            widget.destroy()
 
-        # load login signup page
-        login_signup_page = LogInSignUpPage()
-        login_signup_page.mainloop()
+        # load login page contents
+        login_page = LoginForm(master=self.master.master)
+        login_page.grid(column=0, row=0)
 
     def go_to_home_page_handler(self):
-        from main import App
+        from mainScrollableFrame import MainScrollableFrame
 
-        # destroy current page
-        self.master.master.destroy()
+        # destroy current contents
+        for widget in self.master.master.winfo_children():
+            widget.destroy()
 
-        home_page = App()
-        home_page.mainloop()
+        home_page = MainScrollableFrame(master=self.master.master)
+        home_page.grid(column=0, row=0, sticky='nsew')
 
     def get_fg_color(self):
         return self.cget('fg_color')

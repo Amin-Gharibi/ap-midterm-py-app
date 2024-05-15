@@ -6,10 +6,12 @@ class LoginForm(ctk.CTkFrame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
+        self.master = master
+
         self.configure(fg_color=master.cget("bg"))
 
         # page title
-        self.middle_page_title = ctk.CTkLabel(self, text="LOGIN ", font=("Arial", 36, 'italic'))
+        self.middle_page_title = ctk.CTkLabel(self, text="LOG IN ", font=("Arial", 36, 'italic'))
         self.middle_page_title.grid(row=0, column=0)
 
         # identifier field entry input
@@ -29,5 +31,16 @@ class LoginForm(ctk.CTkFrame):
         # go to signup page button
         self.switch_to_sign_up = ctk.CTkButton(self, text="you don't have an account? Sign Up here!",
                                                fg_color='transparent', hover_color=self.cget('fg_color'),
-                                               cursor='hand2', text_color='#78909C')
+                                               cursor='hand2', text_color='#78909C',
+                                               command=self.switch_to_sign_up)
         self.switch_to_sign_up.grid(row=4, column=0, pady=(30, 0))
+
+    def switch_to_sign_up(self):
+        from modules.signUpForm import SignUpForm
+
+        # destroy current page content
+        self.destroy()
+
+        # load login page contents
+        sign_up_form = SignUpForm(master=self.master)
+        sign_up_form.grid(column=0, row=0)
