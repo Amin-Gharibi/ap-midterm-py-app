@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from mainScrollableFrame import MainScrollableFrame
+import tkinter as tk
 
 # app width and height and other static variables
 APP_WIDTH = 1200
@@ -14,7 +14,7 @@ ctk.set_appearance_mode(APPEARANCE_MODE)
 ctk.set_default_color_theme(COLOR_THEME)
 
 
-class App(ctk.CTk):
+class LogInSignUpPage(ctk.CTk):
     def __init__(self):
         super().__init__()
 
@@ -26,12 +26,3 @@ class App(ctk.CTk):
         # config the column that the header navbar is in it
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
-
-        # contents must scroll, so they all are in the main scrollable frame
-        self.main_page_content = MainScrollableFrame(master=self)
-        self.main_page_content.grid(row=0, column=0, sticky="nsew")
-
-
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()

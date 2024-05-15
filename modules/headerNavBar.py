@@ -6,15 +6,20 @@ class HeaderNavBar(ctk.CTkFrame):
     def __init__(self, master, **kwargs):
         super().__init__(master, **kwargs)
 
+        self.master = master
+
         # application name title label
-        self.titleLabel = ctk.CTkLabel(self, text="IMDB M.M.", font=("Arial", 28))
+        self.titleLabel = ctk.CTkButton(self, text="IMDB M.M.", font=("Arial", 28),
+                                        fg_color='transparent', hover_color=self.cget('fg_color'),
+                                        cursor='hand2', command=self.go_to_home_page_handler)
         self.titleLabel.pack(side=tk.LEFT,
                              padx=20, pady=20,
                              anchor='nw')
 
         # application signup / login button
         self.signInButton = ctk.CTkButton(self, text="Sign Up / Login", height=30,
-                                          font=("Arial", 16))
+                                          font=("Arial", 16),
+                                          command=self.on_btn_click_handler)
         self.signInButton.pack(side=tk.RIGHT,
                                padx=20, pady=20,
                                anchor='ne')
@@ -34,6 +39,25 @@ class HeaderNavBar(ctk.CTkFrame):
         self.goToArticlesButton.pack(side=tk.RIGHT,
                                      padx=0, pady=20,
                                      anchor='n')
+
+    def on_btn_click_handler(self):
+        from logInSignUpPage import LogInSignUpPage
+
+        # destroy current page
+        self.master.master.destroy()
+
+        # load login signup page
+        login_signup_page = LogInSignUpPage()
+        login_signup_page.mainloop()
+
+    def go_to_home_page_handler(self):
+        from main import App
+
+        # destroy current page
+        self.master.master.destroy()
+
+        home_page = App()
+        home_page.mainloop()
 
     def get_fg_color(self):
         return self.cget('fg_color')

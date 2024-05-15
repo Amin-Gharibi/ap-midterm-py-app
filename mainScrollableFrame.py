@@ -5,9 +5,11 @@ from modules.itemBoxesContainer import ItemBoxesContainer
 from utils.util import format_description
 
 
-class ScrollableFrame(ctk.CTkScrollableFrame):
+class MainScrollableFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
+
+        self.master = master
 
         # configure background color, so it wouldn't change to a color like navbar fg color
         self.configure(fg_color=master.cget("bg"))
@@ -115,6 +117,7 @@ class ScrollableFrame(ctk.CTkScrollableFrame):
             }
         ]
 
+        # create top artists section
         top_artists_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
                                                    title='Top Artists',
                                                    items=artists_details)
