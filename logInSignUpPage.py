@@ -1,5 +1,5 @@
 import customtkinter as ctk
-import tkinter as tk
+from modules.loginForm import LoginForm
 
 # app width and height and other static variables
 APP_WIDTH = 1200
@@ -26,3 +26,6 @@ class LogInSignUpPage(ctk.CTk):
         # config the column that the header navbar is in it
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+
+        self.login_form = LoginForm(master=self)
+        self.login_form.grid(row=0, column=0)
