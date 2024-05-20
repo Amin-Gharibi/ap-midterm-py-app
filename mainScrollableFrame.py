@@ -2,7 +2,10 @@ import customtkinter as ctk
 import tkinter as tk
 from modules.headerNavBar import HeaderNavBar
 from modules.itemBoxesContainer import ItemBoxesContainer
+from modules.searchBox import SearchBox
 from utils.util import format_description
+from modules.moviePage import MoviePage
+from modules.castPage import CastPage
 
 
 class MainScrollableFrame(ctk.CTkScrollableFrame):
@@ -19,54 +22,66 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
         self.grid_rowconfigure(0, weight=1)
 
         # define the header navbar
-        header_navbar = HeaderNavBar(master=self)
+        header_navbar = HeaderNavBar(master=self, parent_count=2)
         header_navbar.grid(row=0, column=0, padx=10, pady=10, sticky='ew')
+
+        # search section
+        search_box = SearchBox(master=self)
+        search_box.grid(row=1, column=0, sticky='ew', pady=(30, 10))
 
         # sample movies details
         movies_details = [
             {
+                "id": 0,
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "rate": 5
             },
             {
+                "id": 1,
                 "title": "After Zendegi",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie.",
                 "cover": "images/imdb_logo.png",
                 "rate": 4.5
             },
             {
+                "id": 2,
                 "title": "After Jendegi",
                 "description": "This movie is so amazing.",
                 "cover": "images/imdb_logo.png",
                 "rate": 1.2
             },
             {
+                "id": 3,
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "rate": 5
             },
             {
+                "id": 4,
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "rate": 5
             },
             {
+                "id": 5,
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "rate": 5
             },
             {
+                "id": 6,
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "rate": 5
             },
             {
+                "id": 7,
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
@@ -81,35 +96,41 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
         # create latest movies section
         latest_movies_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
                                                      title='Latest Movies',
-                                                     items=movies_details)
+                                                     items=movies_details,
+                                                     details_page=MoviePage)
         latest_movies_container.grid(row=2, column=0, sticky='ew')
 
         # create latest articles section
         latest_articles_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
                                                        title='Latest Articles',
-                                                       items=movies_details[:4])
+                                                       items=movies_details[:4],
+                                                       details_page=CastPage)  # this must be changed later
         latest_articles_container.grid(row=3, column=0, sticky='ew')
 
         artists_details = [
             {
+                "id": 0,
                 "cover": "images/imdb_logo.png",
                 "title": "MohamadAmin Gharibi",
                 "description": "",
                 "rate": 4.5
             },
             {
+                "id": 1,
                 "cover": "images/imdb_logo.png",
                 "title": "MohamadAmin Gharibi",
                 "description": "",
                 "rate": 4.5
             },
             {
+                "id": 2,
                 "cover": "images/imdb_logo.png",
                 "title": "MohamadAmin Gharibi",
                 "description": "",
                 "rate": 4.5
             },
             {
+                "id": 3,
                 "cover": "images/imdb_logo.png",
                 "title": "MohamadAmin Gharibi",
                 "description": "",
@@ -120,5 +141,6 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
         # create top artists section
         top_artists_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
                                                    title='Top Artists',
-                                                   items=artists_details)
+                                                   items=artists_details,
+                                                   details_page=CastPage)
         top_artists_container.grid(row=4, column=0, sticky='ew')

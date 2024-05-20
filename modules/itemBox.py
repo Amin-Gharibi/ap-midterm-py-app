@@ -4,8 +4,11 @@ from PIL import Image
 
 
 class ItemBox(tk.Frame):
-    def __init__(self, cover, title, description, rate, target_fg_color, **kwargs):
+    def __init__(self, id, cover, title, description, rate, target_fg_color, details_page, **kwargs):
         super().__init__(**kwargs)
+
+        self.details_page = details_page
+        self.id = id
 
         # configure bg color, so it would change and user feel the box is separate from the background,
         # like the header navbar
@@ -35,5 +38,19 @@ class ItemBox(tk.Frame):
         rate_label.grid(row=4, column=0, padx=10, sticky="w")
 
         # more details button
-        details_button = ctk.CTkButton(self, text="Details", font=("Arial", 12, 'bold'))
+        details_button = ctk.CTkButton(self, text="Details", font=("Arial", 12, 'bold'), command=self.on_details_click_handler)
         details_button.grid(row=5, column=0, padx=0, pady=(10, 0), sticky="ew")
+
+    def on_details_click_handler(self):
+        for widget in self.master.master.master.winfo_children():
+            widget.destroy()
+
+        dt_page = self.details_page(master=self.master.master.master, movie={
+                "id": 0,
+                "title": "After Life",
+                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
+                "cover": "images/imdb_logo.png",
+                "rate": 5
+            })
+
+        dt_page.grid(row=0, column=0, sticky='nsew')

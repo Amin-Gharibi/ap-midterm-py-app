@@ -3,10 +3,11 @@ import tkinter as tk
 
 
 class HeaderNavBar(ctk.CTkFrame):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, parent_count, **kwargs):
         super().__init__(master, **kwargs)
 
         self.master = master
+        self.parent_count = parent_count
 
         # application name title label
         self.titleLabel = ctk.CTkButton(self, text="IMDB M.M.", font=("Arial", 28),
@@ -43,12 +44,20 @@ class HeaderNavBar(ctk.CTkFrame):
     def on_btn_click_handler(self):
         from modules.loginForm import LoginForm
 
+        # because the . layout in each page is different so i get the count that gets me to . and loop over it
+        parent = None
+        for i in range(self.parent_count):
+            if parent:
+                parent = parent.master
+            else:
+                parent = self.master
+
         # destroy current contents
-        for widget in self.master.master.winfo_children():
+        for widget in parent.winfo_children():
             widget.destroy()
 
         # load login page contents
-        login_page = LoginForm(master=self.master.master)
+        login_page = LoginForm(master=parent)
         login_page.grid(column=0, row=0)
 
     def go_to_home_page_handler(self):
