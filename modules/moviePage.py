@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from modules.headerNavBar import HeaderNavBar
 from modules.imageSlider import ImageSlider
+from modules.itemBoxesContainer import ItemBoxesContainer
+from modules.castPage import CastPage
 
 
 class MoviePage(ctk.CTkScrollableFrame):
@@ -8,6 +10,8 @@ class MoviePage(ctk.CTkScrollableFrame):
         super().__init__(master, *args, **kwargs)
 
         self.movie = movie
+
+        self.configure(fg_color='transparent')
 
         self.grid_columnconfigure(0, weight=1)
 
@@ -24,16 +28,19 @@ class MoviePage(ctk.CTkScrollableFrame):
         image_slider.grid(row=2, column=0)
 
         # movie details frame
-        movie_details_frame = ctk.CTkFrame(self)
+        movie_details_frame = ctk.CTkFrame(self, fg_color='transparent')
         movie_details_frame.grid(row=3, column=0, sticky='ew', padx=50, pady=50)
         movie_details_frame.grid_columnconfigure(0, weight=1)
 
         # summary title
-        summary_title_label = ctk.CTkLabel(movie_details_frame, text='Movie Summary:', font=('Arial', 16, 'bold'), text_color='#78909C')
+        summary_title_label = ctk.CTkLabel(movie_details_frame, text='Movie Summary:', font=('Arial', 16, 'bold'),
+                                           text_color='#78909C')
         summary_title_label.grid(row=0, column=0, sticky='w')
 
         # summary body label
-        summary_label = ctk.CTkLabel(movie_details_frame, text='''lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam ut aliquip ex ea commodo consequat nulla pariatur \n chertopert line 2''', justify='left', anchor='w')
+        summary_label = ctk.CTkLabel(movie_details_frame,
+                                     text='''lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam ut aliquip ex ea commodo consequat nulla pariatur \n chertopert line 2''',
+                                     justify='left', anchor='w')
         summary_label.grid(row=1, column=0, sticky="ew", pady=(5, 0))
 
         # genre temp frame
@@ -55,7 +62,8 @@ class MoviePage(ctk.CTkScrollableFrame):
         release_date_frame.grid(row=3, column=0, sticky='w', pady=(10, 0))
 
         # release date title
-        release_date_title_label = ctk.CTkLabel(release_date_frame, text='Release Date:', font=('Arial', 16, 'bold'), text_color='#78909C')
+        release_date_title_label = ctk.CTkLabel(release_date_frame, text='Release Date:', font=('Arial', 16, 'bold'),
+                                                text_color='#78909C')
         release_date_title_label.grid(row=2, column=0, sticky='w')
 
         # release date body
@@ -69,11 +77,12 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # countries title
         countries_title_label = ctk.CTkLabel(countries_frame, text='Countries:', font=('Arial', 16, 'bold'),
-                                                text_color='#78909C')
+                                             text_color='#78909C')
         countries_title_label.grid(row=2, column=0, sticky='w')
 
         # countries body
-        countries_label = ctk.CTkLabel(countries_frame, text="United States, United Arab Emirates", justify='left', anchor='w')
+        countries_label = ctk.CTkLabel(countries_frame, text="United States, United Arab Emirates", justify='left',
+                                       anchor='w')
         countries_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # language temp frame
@@ -83,12 +92,12 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # language title
         language_title_label = ctk.CTkLabel(language_frame, text='Language:', font=('Arial', 16, 'bold'),
-                                             text_color='#78909C')
+                                            text_color='#78909C')
         language_title_label.grid(row=2, column=0, sticky='w')
 
         # language body
         language_label = ctk.CTkLabel(language_frame, text="English(US)", justify='left',
-                                       anchor='w')
+                                      anchor='w')
         language_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # budget temp frame
@@ -98,12 +107,12 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # budget title
         budget_title_label = ctk.CTkLabel(budget_frame, text='Budget:', font=('Arial', 16, 'bold'),
-                                            text_color='#78909C')
+                                          text_color='#78909C')
         budget_title_label.grid(row=2, column=0, sticky='w')
 
         # budget body
         budget_label = ctk.CTkLabel(budget_frame, text="100,000,000 $", justify='left',
-                                      anchor='w')
+                                    anchor='w')
         budget_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # rate temp frame
@@ -116,5 +125,61 @@ class MoviePage(ctk.CTkScrollableFrame):
         rate_title_label.grid(row=2, column=0, sticky='w')
 
         # rate body
-        rate_label = ctk.CTkLabel(rate_frame, text=f"4.5 {'★' * 4}", font=('Arial', 14, 'italic'), justify='left', anchor='w', text_color='yellow')
+        rate_label = ctk.CTkLabel(rate_frame, text=f"4.5 {'★' * 4}", font=('Arial', 14, 'italic'), justify='left',
+                                  anchor='w', text_color='yellow')
         rate_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
+
+        artists_details = [
+            {
+                "id": 0,
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "id": 1,
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "id": 2,
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "id": 3,
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "id": 2,
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            },
+            {
+                "id": 3,
+                "cover": "images/imdb_logo.png",
+                "title": "MohamadAmin Gharibi",
+                "description": "",
+                "rate": 4.5
+            }
+        ]
+
+        # cast section
+        cast_container = ItemBoxesContainer(master=self, target_fg_color=header.get_fg_color(),
+                                            title='Cast',
+                                            container_bg_color=rate_frame.cget('bg_color'),
+                                            items=artists_details,
+                                            details_page=CastPage)
+        cast_container.grid(row=4, column=0, sticky='ew')
+
+        cast_container.section_title.grid(pady=0)

@@ -5,16 +5,19 @@ from math import floor
 
 
 class ItemBoxesContainer(ctk.CTkFrame):
-    def __init__(self, master, target_fg_color, title, items: list, details_page, **kwargs):
+    def __init__(self, master, target_fg_color, title, items: list, details_page, container_bg_color=None, **kwargs):
         super().__init__(master, **kwargs)
+
+        if container_bg_color is None:
+            container_bg_color = master.cget('bg_color')
 
         # set containers fg color to be like the bg color of the scrollable frame, so user wouldn't feel any change
         # in the bg color
-        self.configure(fg_color=master.cget('bg_color'))
+        self.configure(fg_color=container_bg_color)
 
         # set the title of the section
-        latest_movies_title = SectionTitle(master=self, text=title)
-        latest_movies_title.grid(row=0, column=0, padx=(30, 0), pady=(50, 0), sticky='w')
+        self.section_title = SectionTitle(master=self, text=title)
+        self.section_title.grid(row=0, column=0, padx=(30, 0), pady=(50, 0), sticky='w')
 
         # create boxes from the details passed to the class
         for item in enumerate(items):

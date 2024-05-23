@@ -6,6 +6,8 @@ class ImageSlider(ctk.CTkFrame):
     def __init__(self, master, images_addresses: list, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
+        self.configure(fg_color=master.cget('fg_color'))
+
         self.images = [self.load_and_resize_image(image, (1000, 500)) for image in images_addresses]
         self.small_images = [self.load_and_resize_image(image, (100, 50), opacity=0.5) for image in images_addresses]
         self.image_index = 0
