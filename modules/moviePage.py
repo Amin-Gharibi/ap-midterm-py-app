@@ -3,6 +3,8 @@ from modules.headerNavBar import HeaderNavBar
 from modules.imageSlider import ImageSlider
 from modules.itemBoxesContainer import ItemBoxesContainer
 from modules.castPage import CastPage
+from modules.sectionTitle import SectionTitle
+from modules.commentsSection import CommentsSection
 
 
 class MoviePage(ctk.CTkScrollableFrame):
@@ -27,9 +29,12 @@ class MoviePage(ctk.CTkScrollableFrame):
         image_slider = ImageSlider(self, ['images/imdb_logo.png'])
         image_slider.grid(row=2, column=0)
 
+        movie_details_title = SectionTitle(self, 'Movie Details')
+        movie_details_title.grid(row=3, column=0, sticky='w', padx=(35, 0), pady=(50, 0))
+
         # movie details frame
         movie_details_frame = ctk.CTkFrame(self, fg_color='transparent')
-        movie_details_frame.grid(row=3, column=0, sticky='ew', padx=50, pady=50)
+        movie_details_frame.grid(row=4, column=0, sticky='ew', padx=50, pady=(30, 50))
         movie_details_frame.grid_columnconfigure(0, weight=1)
 
         # summary title
@@ -180,6 +185,50 @@ class MoviePage(ctk.CTkScrollableFrame):
                                             container_bg_color=rate_frame.cget('bg_color'),
                                             items=artists_details,
                                             details_page=CastPage)
-        cast_container.grid(row=4, column=0, sticky='ew')
-
+        cast_container.grid(row=5, column=0, sticky='ew')
         cast_container.section_title.grid(pady=0)
+
+        comments = [
+            {
+                'user': {
+                    'name': 'MohamadAmin Gharibi',
+                    'profile_pic': "images/imdb_logo.png",
+                    'role': 'User'
+                },
+                'body': 'hello world this is test first comment',
+                'rate': 7.5,
+                'responds': [
+                    {
+                        'user': {
+                            'name': 'MohamadAmin Gharibi',
+                            'profile_pic': "images/imdb_logo.png",
+                            'role': 'User'
+                        },
+                        'body': "hello world this is reply first test comment. isn't the UI beautiful? :)"
+                    }
+                ]
+            },
+            {
+                'user': {
+                    'name': 'RFE',
+                    'profile_pic': "images/imdb_logo.png",
+                    'role': 'User'
+                },
+                'body': 'hello world i am gay and this movie is the best of the best',
+                'rate': 1,
+                'responds': [
+                    {
+                        'user': {
+                            'name': 'MohamadAmin Gharibi',
+                            'profile_pic': "images/imdb_logo.png",
+                            'role': 'User'
+                        },
+                        'body': "koskholo nega 😂"
+                    }
+                ]
+            }
+        ]
+
+        # comments section
+        comments_container = CommentsSection(self, comments)
+        comments_container.grid(row=6, column=0, sticky='ew')
