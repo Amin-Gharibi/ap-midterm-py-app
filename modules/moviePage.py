@@ -1,3 +1,4 @@
+from math import ceil
 import customtkinter as ctk
 from modules.headerNavBar import HeaderNavBar
 from modules.imageSlider import ImageSlider
@@ -13,6 +14,8 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         self.movie = movie
 
+        print(self.movie)
+
         self.configure(fg_color='transparent')
 
         self.grid_columnconfigure(0, weight=1)
@@ -22,7 +25,8 @@ class MoviePage(ctk.CTkScrollableFrame):
         header.grid(row=0, column=0, sticky="ew")
 
         # page title
-        page_title = ctk.CTkLabel(self, text=movie['title'], font=('Arial', 36, 'italic'))
+        # add space after movie title because the font is italic
+        page_title = ctk.CTkLabel(self, text=movie['title'] + ' ', font=('Arial', 36, 'italic'))
         page_title.grid(row=1, column=0, sticky="ew", pady=(50, 30))
 
         # image slider
@@ -44,7 +48,7 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # summary body label
         summary_label = ctk.CTkLabel(movie_details_frame,
-                                     text='''lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam ut aliquip ex ea commodo consequat nulla pariatur \n chertopert line 2''',
+                                     text=self.movie['description'],
                                      justify='left', anchor='w')
         summary_label.grid(row=1, column=0, sticky="ew", pady=(5, 0))
 
@@ -58,7 +62,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         genre_title_label.grid(row=2, column=0, sticky='w')
 
         # genre body
-        genre_label = ctk.CTkLabel(genre_frame, text="Romance, Comedy", justify='left', anchor='w')
+        genre_label = ctk.CTkLabel(genre_frame, text=self.movie['genre'], justify='left', anchor='w')
         genre_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # release date temp frame
@@ -72,7 +76,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         release_date_title_label.grid(row=2, column=0, sticky='w')
 
         # release date body
-        release_date_label = ctk.CTkLabel(release_date_frame, text="14/07/2005", justify='left', anchor='w')
+        release_date_label = ctk.CTkLabel(release_date_frame, text=self.movie['releaseDate'], justify='left', anchor='w')
         release_date_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # countries temp frame
@@ -86,7 +90,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         countries_title_label.grid(row=2, column=0, sticky='w')
 
         # countries body
-        countries_label = ctk.CTkLabel(countries_frame, text="United States, United Arab Emirates", justify='left',
+        countries_label = ctk.CTkLabel(countries_frame, text=self.movie['countries'], justify='left',
                                        anchor='w')
         countries_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
@@ -96,12 +100,12 @@ class MoviePage(ctk.CTkScrollableFrame):
         language_frame.grid(row=5, column=0, sticky='w', pady=(10, 0))
 
         # language title
-        language_title_label = ctk.CTkLabel(language_frame, text='Language:', font=('Arial', 16, 'bold'),
+        language_title_label = ctk.CTkLabel(language_frame, text='Languages:', font=('Arial', 16, 'bold'),
                                             text_color='#78909C')
         language_title_label.grid(row=2, column=0, sticky='w')
 
         # language body
-        language_label = ctk.CTkLabel(language_frame, text="English(US)", justify='left',
+        language_label = ctk.CTkLabel(language_frame, text=self.movie['languages'], justify='left',
                                       anchor='w')
         language_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
@@ -116,7 +120,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         budget_title_label.grid(row=2, column=0, sticky='w')
 
         # budget body
-        budget_label = ctk.CTkLabel(budget_frame, text="100,000,000 $", justify='left',
+        budget_label = ctk.CTkLabel(budget_frame, text=f"{'{:,}'.format(self.movie['budget'])} $", justify='left',
                                     anchor='w')
         budget_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
@@ -130,7 +134,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         rate_title_label.grid(row=2, column=0, sticky='w')
 
         # rate body
-        rate_label = ctk.CTkLabel(rate_frame, text=f"4.5 {'★' * 4}", font=('Arial', 14, 'italic'), justify='left',
+        rate_label = ctk.CTkLabel(rate_frame, text=f"{self.movie['rate']} {'⭐' * ceil(self.movie['rate'])}", font=('Arial', 14, 'italic'), justify='left',
                                   anchor='w', text_color='yellow')
         rate_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 

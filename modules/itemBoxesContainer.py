@@ -21,6 +21,8 @@ class ItemBoxesContainer(ctk.CTkFrame):
 
         # create boxes from the details passed to the class
         for item in enumerate(items):
-            items_box = ItemBox(master=self, id=item[1]['id'], cover=item[1]['cover'], title=item[1]['title'], description=item[1]['description'],
-                                rate=item[1]['rate'], target_fg_color=target_fg_color, details_page=details_page)
-            items_box.grid(row=floor(item[0] / 4) + 1, column=(item[0] % 4), padx=(50, 0), pady=(50, 0))
+            (ItemBox(master=self,
+                     target_fg_color=target_fg_color,
+                     details_page=details_page,
+                     item=item[1])
+             .grid(row=floor(item[0] / 4) + 1, column=(item[0] % 4), padx=(50, 0), pady=(50, 0)))

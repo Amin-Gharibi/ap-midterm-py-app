@@ -1,5 +1,4 @@
 import customtkinter as ctk
-import tkinter as tk
 from modules.headerNavBar import HeaderNavBar
 from modules.itemBoxesContainer import ItemBoxesContainer
 from modules.searchBox import SearchBox
@@ -36,6 +35,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 5
             },
             {
@@ -43,6 +47,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Zendegi",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie.",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 4.5
             },
             {
@@ -50,6 +59,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Jendegi",
                 "description": "This movie is so amazing.",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 1.2
             },
             {
@@ -57,6 +71,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 5
             },
             {
@@ -64,6 +83,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 5
             },
             {
@@ -71,6 +95,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 5
             },
             {
@@ -78,6 +107,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 5
             },
             {
@@ -85,6 +119,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                 "title": "After Life",
                 "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
+                "genre": "romance, comedy",
+                "releaseDate": "23/05/2024",
+                "countries": "United States Of America, United Arab Emirates",
+                "languages": "English(US)",
+                "budget": 100_000_000,
                 "rate": 5
             }
         ]
@@ -110,31 +149,43 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
         artists_details = [
             {
                 "id": 0,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
+                "profilePic": "images/imdb_logo.png",
+                "fullName": "MohamadAmin Gharibi",
+                "biography": "",
+                "rate": 4.5,
+                "height": 178,
+                "birthDate": "14/07/2005",
+                "birthPlace": "Minab, Hormozgan, Iran"
             },
             {
                 "id": 1,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
+                "profilePic": "images/imdb_logo.png",
+                "fullName": "MohamadAmin Gharibi",
+                "biography": "",
+                "rate": 4.5,
+                "height": 178,
+                "birthDate": "14/07/2005",
+                "birthPlace": "Minab, Hormozgan, Iran"
             },
             {
                 "id": 2,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
+                "profilePic": "images/imdb_logo.png",
+                "fullName": "MohamadAmin Gharibi",
+                "biography": "",
+                "rate": 4.5,
+                "height": 178,
+                "birthDate": "14/07/2005",
+                "birthPlace": "Minab, Hormozgan, Iran"
             },
             {
                 "id": 3,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
+                "profilePic": "images/imdb_logo.png",
+                "fullName": "MohamadAmin Gharibi",
+                "biography": "",
+                "rate": 4.5,
+                "height": 178,
+                "birthDate": "14/07/2005",
+                "birthPlace": "Minab, Hormozgan, Iran"
             }
         ]
 
