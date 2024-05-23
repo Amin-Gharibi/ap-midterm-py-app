@@ -5,6 +5,7 @@ from modules.searchBox import SearchBox
 from utils.util import format_description
 from modules.moviePage import MoviePage
 from modules.castPage import CastPage
+from modules.articlePage import ArticlePage
 
 
 class MainScrollableFrame(ctk.CTkScrollableFrame):
@@ -139,11 +140,40 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
                                                      details_page=MoviePage)
         latest_movies_container.grid(row=2, column=0, sticky='ew')
 
+        articles = [
+            {
+                "id": 0,
+                "title": "Article 1",
+                "cover": "images/imdb_logo.png",
+                "body": "this is bullshit body dude",
+                "author": {
+                    "id": 0,
+                    "fullName": "MohamadAmin Gharibi",
+                    "profilePic": "images/imdb_logo.png",
+                    "role": "User"
+                },
+                "rate": 2
+            },
+            {
+                "id": 0,
+                "title": "Article 2",
+                "cover": "images/imdb_logo.png",
+                "body": "this is kossher body dude",
+                "author": {
+                    "id": 0,
+                    "fullName": "MohamadAmin Gharibi",
+                    "profilePic": "images/imdb_logo.png",
+                    "role": "User"
+                },
+                "rate": 4.5
+            }
+        ]
+
         # create latest articles section
         latest_articles_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
                                                        title='Latest Articles',
-                                                       items=movies_details[:4],
-                                                       details_page=CastPage)  # this must be changed later
+                                                       items=articles,
+                                                       details_page=ArticlePage)  # this must be changed later
         latest_articles_container.grid(row=3, column=0, sticky='ew')
 
         artists_details = [

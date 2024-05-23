@@ -14,10 +14,7 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         self.movie = movie
 
-        print(self.movie)
-
         self.configure(fg_color='transparent')
-
         self.grid_columnconfigure(0, weight=1)
 
         # header navbar
@@ -26,7 +23,7 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # page title
         # add space after movie title because the font is italic
-        page_title = ctk.CTkLabel(self, text=movie['title'] + ' ', font=('Arial', 36, 'italic'))
+        page_title = ctk.CTkLabel(self, text=self.movie['title'] + ' ', font=('Arial', 36, 'italic'))
         page_title.grid(row=1, column=0, sticky="ew", pady=(50, 30))
 
         # image slider
