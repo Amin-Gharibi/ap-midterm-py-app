@@ -22,7 +22,7 @@ class UserDashboard(ctk.CTkFrame):
         self.my_profile_button = ctk.CTkButton(navbar_frame, text="My Profile", command=lambda: self.load_my_profile_section(dynamic_content_frame))
         self.my_profile_button.grid(row=0, column=0, padx=20, pady=20)
 
-        self.my_comments_button = ctk.CTkButton(navbar_frame, text="My Comments")
+        self.my_comments_button = ctk.CTkButton(navbar_frame, text="My Comments", command=lambda: self.load_my_comments_tab(dynamic_content_frame))
         self.my_comments_button.grid(row=0, column=1, padx=20, pady=20)
 
         self.my_favorite_movies_button = ctk.CTkButton(navbar_frame, text="My Favorite Movies")
@@ -51,6 +51,10 @@ class UserDashboard(ctk.CTkFrame):
         self.my_favorite_movies_button.configure(state='normal')
         self.my_favorite_articles_button.configure(state='normal')
 
+        # empty widgets in the parent
+        for widget in parent.winfo_children():
+            widget.destroy()
+
         # frame to contain left inputs
         left_content_frame = ctk.CTkFrame(parent, fg_color='transparent')
         left_content_frame.grid(row=0, column=0, sticky='nw')
@@ -78,3 +82,61 @@ class UserDashboard(ctk.CTkFrame):
         pick_new_profile_button = ctk.CTkButton(right_content_frame, text="Select New Profile",
                                                 command=self.select_file)
         pick_new_profile_button.grid(row=1, column=0, pady=(20, 0))
+
+    def load_my_comments_tab(self, parent):
+        from modules.comment import Comment
+
+        # disable target tab button and enable other tabs button
+        self.my_comments_button.configure(state='disabled')
+        self.my_profile_button.configure(state='normal')
+        self.my_favorite_movies_button.configure(state='normal')
+        self.my_favorite_articles_button.configure(state='normal')
+
+        # empty widgets in the parent
+        for widget in parent.winfo_children():
+            widget.destroy()
+
+        comments = [
+            {
+                'user': {
+                    'name': 'MohamadAmin Gharibi',
+                    'profile_pic': "images/imdb_logo.png",
+                    'role': 'User'
+                },
+                'body': 'hello world this is test first comment',
+                'rate': 7.5,
+                'responds': [
+                    {
+                        'user': {
+                            'name': 'MohamadAmin Gharibi',
+                            'profile_pic': "images/imdb_logo.png",
+                            'role': 'User'
+                        },
+                        'body': "hello world this is reply first test comment. isn't the UI beautiful? :)"
+                    }
+                ]
+            },
+            {
+                'user': {
+                    'name': 'RFE',
+                    'profile_pic': "images/imdb_logo.png",
+                    'role': 'User'
+                },
+                'body': 'hello world i am gay and this movie is the best of the best',
+                'rate': 1,
+                'responds': [
+                    {
+                        'user': {
+                            'name': 'MohamadAmin Gharibi',
+                            'profile_pic': "images/imdb_logo.png",
+                            'role': 'User'
+                        },
+                        'body': "koskholo nega 😂"
+                    }
+                ]
+            }
+        ]
+
+        # create each comments template from the backend
+        for index, comment in enumerate(comments):
+            Comment(parent, comment, fg_color='gray23').grid(row=index, column=0, sticky='ew', padx=20, pady=20)
