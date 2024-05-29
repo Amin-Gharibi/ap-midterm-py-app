@@ -15,7 +15,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
         self.master = master
 
         # configure background color, so it wouldn't change to a color like navbar fg color
-        self.configure(fg_color=master.cget("bg"))
+        self.configure(fg_color="gray14")
 
         # configure grid system
         self.grid_columnconfigure(0, weight=1)

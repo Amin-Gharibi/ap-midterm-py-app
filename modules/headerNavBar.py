@@ -63,11 +63,19 @@ class HeaderNavBar(ctk.CTkFrame):
     def go_to_home_page_handler(self):
         from mainScrollableFrame import MainScrollableFrame
 
+        # because the . layout in each page is different so i get the count that gets me to . and loop over it
+        parent = None
+        for i in range(self.parent_count):
+            if parent:
+                parent = parent.master
+            else:
+                parent = self.master
+
         # destroy current contents
-        for widget in self.master.master.winfo_children():
+        for widget in parent.winfo_children():
             widget.destroy()
 
-        home_page = MainScrollableFrame(master=self.master.master)
+        home_page = MainScrollableFrame(master=parent)
         home_page.grid(column=0, row=0, sticky='nsew')
 
     def get_fg_color(self):
