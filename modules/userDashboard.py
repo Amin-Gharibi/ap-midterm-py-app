@@ -28,7 +28,7 @@ class UserDashboard(ctk.CTkFrame):
         self.my_favorite_movies_button = ctk.CTkButton(navbar_frame, text="My Favorite Movies", command=lambda: self.load_my_favorite_movies_tab(dynamic_content_frame))
         self.my_favorite_movies_button.grid(row=0, column=2, padx=20, pady=20)
 
-        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Favorite Articles")
+        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Favorite Articles", command=lambda: self.load_my_favorite_articles_tab(dynamic_content_frame))
         self.my_favorite_articles_button.grid(row=0, column=3, padx=20, pady=20)
 
         # this frame would contain each tab's content
@@ -255,8 +255,58 @@ class UserDashboard(ctk.CTkFrame):
             }
         ]
 
-        holder_frame = ctk.CTkFrame(parent)
+        holder_frame = ctk.CTkFrame(parent, fg_color='transparent')
         holder_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
 
         for index, movie in enumerate(movies_details):
-            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(row=floor(index / 4) + 1, column=(index % 4))
+            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(row=floor(index / 4) + 1, column=(index % 4), padx=10, pady=10)
+
+    def load_my_favorite_articles_tab(self, parent):
+        from modules.itemBox import ItemBox
+        from modules.articlePage import ArticlePage
+        from math import floor
+
+        # disable target tab button and enable other tabs button
+        self.my_favorite_articles_button.configure(state='disabled')
+        self.my_profile_button.configure(state='normal')
+        self.my_comments_button.configure(state='normal')
+        self.my_favorite_movies_button.configure(state='normal')
+
+        # empty widgets in the parent
+        for widget in parent.winfo_children():
+            widget.destroy()
+
+        articles = [
+            {
+                "id": 0,
+                "title": "Article 1",
+                "cover": "images/imdb_logo.png",
+                "body": "this is bullshit body dude",
+                "author": {
+                    "id": 0,
+                    "fullName": "MohamadAmin Gharibi",
+                    "profilePic": "images/imdb_logo.png",
+                    "role": "User"
+                },
+                "rate": 2
+            },
+            {
+                "id": 0,
+                "title": "Article 2",
+                "cover": "images/imdb_logo.png",
+                "body": "this is kossher body dude",
+                "author": {
+                    "id": 0,
+                    "fullName": "MohamadAmin Gharibi",
+                    "profilePic": "images/imdb_logo.png",
+                    "role": "User"
+                },
+                "rate": 4.5
+            }
+        ]
+
+        holder_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        holder_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
+        for index, article in enumerate(articles):
+            ItemBox(master=holder_frame, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage, item=article).grid(row=floor(index / 4) + 1, column=(index % 4), padx=10, pady=10)
