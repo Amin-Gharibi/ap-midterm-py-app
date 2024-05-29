@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from mainScrollableFrame import MainScrollableFrame
+from modules.userDashboard import UserDashboard
 
 # app width and height and other static variables
 APP_WIDTH = 1200
@@ -28,8 +29,10 @@ class App(ctk.CTk):
         self.grid_rowconfigure(0, weight=1)
 
         # contents must scroll, so they all are in the main scrollable frame
-        self.main_page_content = MainScrollableFrame(master=self)
-        self.main_page_content.grid(row=0, column=0, sticky="nsew")
+        # self.main_page_content = MainScrollableFrame(master=self)
+        # self.main_page_content.grid(row=0, column=0, sticky="nsew")
+        dashboard = UserDashboard(self)
+        dashboard.grid(row=0, column=0, sticky="nsew")
 
 
 if __name__ == "__main__":
