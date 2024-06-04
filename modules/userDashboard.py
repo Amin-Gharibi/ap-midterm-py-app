@@ -39,17 +39,23 @@ class UserDashboard(ctk.CTkFrame):
         dynamic_content_frame.grid_columnconfigure(0, weight=1)
         dynamic_content_frame.grid_columnconfigure(1, weight=1)
 
+        self.load_my_profile_tab(dynamic_content_frame)
+
     def select_file(self):
         file_name = filedialog.askopenfilename()
         print(file_name)
         return file_name
 
-    def load_my_profile_tab(self, parent):
+    def load_my_profile_tab(self, parent, btn_container=None):
+        # if the function was used from AdminDashboard then change the btn container and disable buttons there
+        if btn_container is None:
+            btn_container = self
+
         # disable target tab button and enable other tabs button
-        self.my_profile_button.configure(state='disabled')
-        self.my_comments_button.configure(state='normal')
-        self.my_favorite_movies_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        btn_container.my_profile_button.configure(state='disabled')
+        btn_container.my_comments_button.configure(state='normal')
+        btn_container.my_favorite_movies_button.configure(state='normal')
+        btn_container.my_favorite_articles_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -83,14 +89,18 @@ class UserDashboard(ctk.CTkFrame):
                                                 command=self.select_file)
         pick_new_profile_button.grid(row=1, column=0, pady=(20, 0))
 
-    def load_my_comments_tab(self, parent):
+    def load_my_comments_tab(self, parent, btn_container=None):
         from modules.comment import Comment
 
+        # if the function was used from AdminDashboard then change the btn container and disable buttons there
+        if btn_container is None:
+            btn_container = self
+
         # disable target tab button and enable other tabs button
-        self.my_comments_button.configure(state='disabled')
-        self.my_profile_button.configure(state='normal')
-        self.my_favorite_movies_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        btn_container.my_comments_button.configure(state='disabled')
+        btn_container.my_profile_button.configure(state='normal')
+        btn_container.my_favorite_movies_button.configure(state='normal')
+        btn_container.my_favorite_articles_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -141,16 +151,20 @@ class UserDashboard(ctk.CTkFrame):
         for index, comment in enumerate(comments):
             Comment(parent, comment, fg_color='gray23').grid(row=index, column=0, sticky='ew', padx=20, pady=20)
 
-    def load_my_favorite_movies_tab(self, parent):
+    def load_my_favorite_movies_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
         from modules.moviePage import MoviePage
         from math import floor
 
+        # if the function was used from AdminDashboard then change the btn container and disable buttons there
+        if btn_container is None:
+            btn_container = self
+
         # disable target tab button and enable other tabs button
-        self.my_favorite_movies_button.configure(state='disabled')
-        self.my_profile_button.configure(state='normal')
-        self.my_comments_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        btn_container.my_favorite_movies_button.configure(state='disabled')
+        btn_container.my_profile_button.configure(state='normal')
+        btn_container.my_comments_button.configure(state='normal')
+        btn_container.my_favorite_articles_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -261,16 +275,20 @@ class UserDashboard(ctk.CTkFrame):
         for index, movie in enumerate(movies_details):
             ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(row=floor(index / 4) + 1, column=(index % 4), padx=10, pady=10)
 
-    def load_my_favorite_articles_tab(self, parent):
+    def load_my_favorite_articles_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
         from modules.articlePage import ArticlePage
         from math import floor
 
+        # if the function was used from AdminDashboard then change the btn container and disable buttons there
+        if btn_container is None:
+            btn_container = self
+
         # disable target tab button and enable other tabs button
-        self.my_favorite_articles_button.configure(state='disabled')
-        self.my_profile_button.configure(state='normal')
-        self.my_comments_button.configure(state='normal')
-        self.my_favorite_movies_button.configure(state='normal')
+        btn_container.my_favorite_articles_button.configure(state='disabled')
+        btn_container.my_profile_button.configure(state='normal')
+        btn_container.my_comments_button.configure(state='normal')
+        btn_container.my_favorite_movies_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
