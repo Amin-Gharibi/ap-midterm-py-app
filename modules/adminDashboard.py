@@ -1,3 +1,5 @@
+from tkinter import filedialog
+
 import customtkinter as ctk
 from modules.userDashboard import UserDashboard
 from modules.sectionTitle import SectionTitle
@@ -47,8 +49,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.users_button.grid(row=0, column=4, padx=20, pady=20)
 
         self.movies_button = ctk.CTkButton(navbar_frame, text="Movies",
-                                           command=lambda: user_dashboard.load_my_favorite_articles_tab(
-                                               dynamic_content_frame, self))
+                                           command=lambda: self.load_movies_tab(dynamic_content_frame))
         self.movies_button.grid(row=0, column=5, padx=20, pady=20)
 
         self.articles_button = ctk.CTkButton(navbar_frame, text="Articles",
@@ -67,8 +68,8 @@ class AdminDashboard(ctk.CTkFrame):
         # handle its grid system
         dynamic_content_frame.grid_columnconfigure((0, 1), weight=1)
 
-        # user_dashboard.load_my_profile_tab(dynamic_content_frame)
-        self.load_users_tab(dynamic_content_frame)
+        user_dashboard.load_my_profile_tab(dynamic_content_frame)
+        # self.load_users_tab(dynamic_content_frame)
 
     def load_users_tab(self, parent):
         from modules.plainInput import PlainInput
@@ -123,33 +124,109 @@ class AdminDashboard(ctk.CTkFrame):
         add_new_user_submit_btn = ctk.CTkButton(add_new_user_frame, text='Submit', height=30)
         add_new_user_submit_btn.grid(row=3, column=1, pady=(10, 0))
 
-        # list of users waiting to be approved
-        users_waiting_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        users_waiting_list_frame.grid(row=2, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
-
-        SectionTitle(users_waiting_list_frame, text="Users Wait-List").pack(anchor='w')
-
         values = [['ID', 'Username', 'Full Name', 'Role', 'Approve', 'Reject'],
                   ['0', 'amingharibi', 'Mohamad Amin Gharibi', 'Admin', 'Approve', 'Reject'],
                   ['1', 'amin', 'Amin Gharibi', 'User', 'Approve', 'Reject'],
                   ['2', 'gharibi', 'Mohamad Gharibi', 'Montaghed', 'Approve', 'Reject'],
                   ['3', 'am_gh', 'MohamadAmin Gharibi', 'Admin', 'Approve', 'Reject']]
 
+        # list of users waiting to be approved
+        users_waiting_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        users_waiting_list_frame.grid(row=2, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
+        SectionTitle(users_waiting_list_frame, text="Users Wait-List").pack(anchor='w')
         wait_list_table = CTkTable(master=users_waiting_list_frame, row=5, column=6, values=values,
-                                   command=self.handle_approving, hover=True, column_hover=[4, 5], not_hover_row=0,
+                                   command=self.handle_approving_user, hover=True, column_hover=[4, 5], not_hover_row=0,
                                    hover_color='#1B5E20')
         wait_list_table.pack(expand=True, fill='both', pady=(10, 0))
 
+        # list of all users
         all_users_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
         all_users_list_frame.grid(row=3, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
-
         SectionTitle(all_users_list_frame, text='All Users').pack(anchor='w')
-
         all_users_table = CTkTable(master=all_users_list_frame, row=5, column=6, values=values,
-                                   command=self.handle_approving, hover=True, column_hover=[4, 5], not_hover_row=0,
+                                   command=self.handle_approving_user, hover=True, column_hover=[4, 5], not_hover_row=0,
                                    hover_color='#1B5E20')
         all_users_table.pack(expand=True, fill='both', pady=(10, 0))
 
-    def handle_approving(self, *kwargs):
+    def handle_approving_user(self, *kwargs):
         if kwargs[0]['row'] > 0 and kwargs[0]['column'] == 4:
             print('approved')
+
+    def load_movies_tab(self, parent):
+        from modules.plainInput import PlainInput
+
+        # disable target tab button and enable other tabs button
+        self.movies_button.configure(state='disabled')
+        self.my_profile_button.configure(state='normal')
+        self.my_comments_button.configure(state='normal')
+        self.my_favorite_movies_button.configure(state='normal')
+        self.my_favorite_articles_button.configure(state='normal')
+        self.users_button.configure(state='normal')
+        self.articles_button.configure(state='normal')
+        self.comments_button.configure(state='normal')
+
+        # empty widgets in the parent
+        for widget in parent.winfo_children():
+            widget.destroy()
+
+        add_new_movie_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        add_new_movie_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        add_new_movie_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
+
+        SectionTitle(add_new_movie_frame, text='Add New Movie').grid(row=0, column=0, sticky='w', padx=30, pady=(0, 20))
+
+        full_name_input = PlainInput(add_new_movie_frame, label_text='Movie Full Name:', input_placeholder="Enter Movie Name...")
+        full_name_input.grid(row=1, column=0)
+
+        genre_input = PlainInput(add_new_movie_frame, label_text='Movie Genre:', input_placeholder="Enter Movie Genres...")
+        genre_input.grid(row=1, column=1)
+
+        release_date_input = PlainInput(add_new_movie_frame, label_text='Release Date:', input_placeholder="Enter Movie Release Date...")
+        release_date_input.grid(row=1, column=2)
+
+        language_input = PlainInput(add_new_movie_frame, label_text='Movie Language:', input_placeholder="Enter Movie Languages...")
+        language_input.grid(row=2, column=0, pady=20)
+
+        countries_input = PlainInput(add_new_movie_frame, label_text='Movie Country:', input_placeholder='Enter Movie Countries...')
+        countries_input.grid(row=2, column=1)
+
+        budget_input = PlainInput(add_new_movie_frame, label_text='Movie Budget:', input_placeholder='Enter Movie Budget...')
+        budget_input.grid(row=2, column=2)
+
+        movie_summary_frame = ctk.CTkFrame(add_new_movie_frame, fg_color='transparent')
+        movie_summary_frame.grid_columnconfigure(0, weight=1)
+        movie_summary_frame.grid(row=3, column=0, columnspan=3, sticky="ew", padx=45)
+        ctk.CTkLabel(movie_summary_frame, text='Movie Summary:', text_color='gray', font=("Arial", 12, 'italic')).grid(row=0, column=0, sticky='w')
+        movie_summary_input = ctk.CTkTextbox(movie_summary_frame)
+        movie_summary_input.grid(row=1, column=0, sticky='ew')
+
+        movie_medias = []
+        movie_medias_frame = ctk.CTkFrame(add_new_movie_frame, fg_color='transparent')
+        movie_medias_frame.grid(row=4, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
+        ctk.CTkLabel(movie_medias_frame, text='Movie Medias:', text_color='gray', font=("Arial", 12, "italic")).grid(row=0, column=0, sticky='w')
+        ctk.CTkButton(movie_medias_frame, text='Add Media', command=self.select_file).grid(row=1, column=0, sticky='w')
+        selected_medias_count_label = ctk.CTkLabel(movie_medias_frame, text=f'{len(movie_medias)} Medias Have Been Selected!')
+        selected_medias_count_label.grid(row=0, column=1, padx=20)
+
+        movie_cast_frame = ctk.CTkFrame(add_new_movie_frame, fg_color='transparent')
+        movie_cast_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        movie_cast_frame.grid(row=5, column=0, columnspan=3, sticky="ew", padx=45)
+        ctk.CTkLabel(movie_cast_frame, text='Movie Cast:', text_color='gray', font=('Arial', 14, 'italic')).grid(row=0, column=0, sticky='w')
+        cast_name_input = PlainInput(movie_cast_frame, label_text='Name:', input_placeholder='Enter Cast Name...')
+        cast_name_input.grid(row=1, column=0, sticky='nw')
+        ctk.CTkButton(movie_cast_frame, text='Search').grid(row=1, column=0, sticky='w')
+        ctk.CTkLabel(movie_cast_frame, text='Search Results:', text_color='gray', font=('Arial', 10, 'italic')).grid(row=0, column=1)
+        cast_result_box = ctk.CTkFrame(movie_cast_frame, width=200)
+        cast_result_box.grid_columnconfigure(0, weight=1)
+        cast_result_box.grid(row=1, column=1, sticky='ew')
+        ctk.CTkLabel(movie_cast_frame, text='Selected Cast:', text_color='gray', font=('Arial', 10, 'italic')).grid(row=0, column=2)
+        cast_selected_box = ctk.CTkFrame(movie_cast_frame, width=200)
+        cast_selected_box.grid_columnconfigure(0, weight=1)
+        cast_selected_box.grid(row=1, column=2, sticky='ew', padx=100)
+
+    def select_file(self):
+        file_name = filedialog.askopenfilename()
+        print(file_name)
+        return file_name
+
+
