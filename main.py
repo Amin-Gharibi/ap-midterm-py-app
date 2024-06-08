@@ -1,4 +1,6 @@
 import customtkinter as ctk
+from dotenv import load_dotenv
+import utils.util
 from mainScrollableFrame import MainScrollableFrame
 from modules.userDashboard import UserDashboard
 from modules.adminDashboard import AdminDashboard
@@ -20,6 +22,8 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
+        load_dotenv()
+
         # set application title
         self.title("IMDB M.M.")
         # set application sizes
@@ -37,7 +41,6 @@ class App(ctk.CTk):
         # admin dashboard
         dashboard = AdminDashboard(self)
         dashboard.grid(row=0, column=0, sticky="nsew")
-
 
 
 if __name__ == "__main__":
