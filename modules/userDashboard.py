@@ -91,6 +91,7 @@ class UserDashboard(ctk.CTkFrame):
 
     def load_my_comments_tab(self, parent, btn_container=None):
         from modules.comment import Comment
+        from modules.sectionTitle import SectionTitle
 
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
         if btn_container is None:
@@ -147,14 +148,17 @@ class UserDashboard(ctk.CTkFrame):
             }
         ]
 
+        SectionTitle(parent, 'My Comments').grid(row=0, column=0, sticky='w', padx=20)
+
         # create each comments template from the backend
         for index, comment in enumerate(comments):
-            Comment(parent, comment, fg_color='gray23').grid(row=index, column=0, sticky='ew', padx=20, pady=20)
+            Comment(parent, comment, fg_color='gray23').grid(row=index+1, column=0, columnspan=2, sticky='ew', padx=40, pady=20)
 
     def load_my_favorite_movies_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
         from modules.moviePage import MoviePage
         from math import floor
+        from modules.sectionTitle import SectionTitle
 
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
         if btn_container is None:
@@ -271,14 +275,16 @@ class UserDashboard(ctk.CTkFrame):
 
         holder_frame = ctk.CTkFrame(parent, fg_color='transparent')
         holder_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        SectionTitle(holder_frame, text="Favorite Movies").grid(row=0, column=0, sticky='w', padx=20)
 
         for index, movie in enumerate(movies_details):
-            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(row=floor(index / 4) + 1, column=(index % 4), padx=10, pady=10)
+            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(row=floor(index / 4) + 2, column=(index % 4), padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)
 
     def load_my_favorite_articles_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
         from modules.articlePage import ArticlePage
         from math import floor
+        from modules.sectionTitle import SectionTitle
 
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
         if btn_container is None:
@@ -293,6 +299,48 @@ class UserDashboard(ctk.CTkFrame):
         # empty widgets in the parent
         for widget in parent.winfo_children():
             widget.destroy()
+
+        is_admin = True
+
+        if not is_admin:
+            add_new_article_frame = ctk.CTkFrame(parent, fg_color='transparent')
+            add_new_article_frame.grid_columnconfigure((0, 1, 2), weight=1)
+            add_new_article_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
+
+            SectionTitle(add_new_article_frame, text='Add New Article').grid(row=0, column=0, sticky='w', padx=30,
+                                                                             pady=(0, 20))
+
+            title_input = PlainInput(add_new_article_frame, label_text='Article Title:',
+                                     input_placeholder="Enter Article Title...")
+            title_input.grid(row=1, column=0, sticky='w', padx=45)
+
+            article_body_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+            article_body_frame.grid_columnconfigure(0, weight=1)
+            article_body_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=45, pady=10)
+            ctk.CTkLabel(article_body_frame, text='Article Body:', text_color='gray',
+                         font=("Arial", 12, 'italic')).grid(
+                row=0, column=0, sticky='w')
+            article_body_input = ctk.CTkTextbox(article_body_frame)
+            article_body_input.grid(row=1, column=0, sticky='ew')
+
+            article_cover = None
+            article_cover_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+            article_cover_frame.grid(row=3, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
+            ctk.CTkLabel(article_cover_frame, text='Article Cover:', text_color='gray',
+                         font=("Arial", 12, "italic")).grid(
+                row=0, column=0, sticky='w')
+            ctk.CTkButton(article_cover_frame, text='Add Cover', command=self.select_file).grid(row=1, column=0,
+                                                                                                sticky='w')
+            selected_cover_count_label = ctk.CTkLabel(article_cover_frame,
+                                                      text=article_cover and 'Article Cover Has Been Selected!' or 'Please Select Article Cover')
+            selected_cover_count_label.grid(row=0, column=1, padx=20)
+
+            submit_form_buttons_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+            submit_form_buttons_frame.grid(row=4, column=0, columnspan=3, pady=40)
+            ctk.CTkButton(submit_form_buttons_frame, text='Create').grid(row=0, column=0)
+            ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350',
+                          hover_color='#C62828').grid(
+                row=0, column=1, padx=30)
 
         articles = [
             {
@@ -324,7 +372,8 @@ class UserDashboard(ctk.CTkFrame):
         ]
 
         holder_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        holder_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+        holder_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
+        SectionTitle(holder_frame, text="Favorite Articles").grid(row=0, column=0, sticky='w', padx=20)
 
         for index, article in enumerate(articles):
-            ItemBox(master=holder_frame, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage, item=article).grid(row=floor(index / 4) + 1, column=(index % 4), padx=10, pady=10)
+            ItemBox(master=holder_frame, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage, item=article).grid(row=floor(index / 4) + 2, column=(index % 4), padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)

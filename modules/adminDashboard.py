@@ -53,8 +53,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.movies_button.grid(row=0, column=5, padx=20, pady=20)
 
         self.articles_button = ctk.CTkButton(navbar_frame, text="Articles",
-                                             command=lambda: user_dashboard.load_my_favorite_articles_tab(
-                                                 dynamic_content_frame, self))
+                                             command=lambda: self.load_articles_tab(dynamic_content_frame))
         self.articles_button.grid(row=0, column=6, padx=20, pady=20)
 
         self.comments_button = ctk.CTkButton(navbar_frame, text="Comments",
@@ -282,3 +281,77 @@ class AdminDashboard(ctk.CTkFrame):
         file_name = filedialog.askopenfilename()
         print(file_name)
         return file_name
+
+    def load_articles_tab(self, parent):
+        from modules.plainInput import PlainInput
+
+        # disable target tab button and enable other tabs button
+        self.movies_button.configure(state='disabled')
+        self.my_profile_button.configure(state='normal')
+        self.my_comments_button.configure(state='normal')
+        self.my_favorite_movies_button.configure(state='normal')
+        self.my_favorite_articles_button.configure(state='normal')
+        self.users_button.configure(state='normal')
+        self.articles_button.configure(state='normal')
+        self.comments_button.configure(state='normal')
+
+        # empty widgets in the parent
+        for widget in parent.winfo_children():
+            widget.destroy()
+
+        add_new_article_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        add_new_article_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        add_new_article_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
+
+        SectionTitle(add_new_article_frame, text='Add New Article').grid(row=0, column=0, sticky='w', padx=30,
+                                                                         pady=(0, 20))
+
+        title_input = PlainInput(add_new_article_frame, label_text='Article Title:',
+                                 input_placeholder="Enter Article Title...")
+        title_input.grid(row=1, column=0, sticky='w', padx=45)
+
+        article_body_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        article_body_frame.grid_columnconfigure(0, weight=1)
+        article_body_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=45, pady=10)
+        ctk.CTkLabel(article_body_frame, text='Article Body:', text_color='gray', font=("Arial", 12, 'italic')).grid(
+            row=0, column=0, sticky='w')
+        article_body_input = ctk.CTkTextbox(article_body_frame)
+        article_body_input.grid(row=1, column=0, sticky='ew')
+
+        article_cover = None
+        article_cover_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        article_cover_frame.grid(row=3, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
+        ctk.CTkLabel(article_cover_frame, text='Article Cover:', text_color='gray', font=("Arial", 12, "italic")).grid(
+            row=0, column=0, sticky='w')
+        ctk.CTkButton(article_cover_frame, text='Add Cover', command=self.select_file).grid(row=1, column=0, sticky='w')
+        selected_cover_count_label = ctk.CTkLabel(article_cover_frame,
+                                                  text=article_cover and 'Article Cover Has Been Selected!' or 'Please Select Article Cover')
+        selected_cover_count_label.grid(row=0, column=1, padx=20)
+
+        submit_form_buttons_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        submit_form_buttons_frame.grid(row=4, column=0, columnspan=3, pady=40)
+        ctk.CTkButton(submit_form_buttons_frame, text='Create').grid(row=0, column=0)
+        ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350', hover_color='#C62828').grid(
+            row=0, column=1, padx=30)
+
+        all_articles_list = [
+            ['Title', 'Rate', 'Status', 'Details', 'Edit', 'Delete'],
+            ['After Jendegi', '4.3', 'Published', 'Details', 'Edit', 'Delete'],
+            ['After Life', '4.1', 'Published', 'Details', 'Edit', 'Delete'],
+            ['After Zendegi', '0.0', 'Draft', 'Details', 'Edit', 'Delete']
+        ]
+
+        all_articles_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        all_articles_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
+        temp_frame = ctk.CTkFrame(all_articles_frame, fg_color='transparent')
+        temp_frame.pack(expand=True, fill='x')
+        SectionTitle(temp_frame, text='All Articles').pack(padx=30, side=tkinter.LEFT)
+        search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
+        search_box_frame.pack(padx=30, side=tkinter.RIGHT)
+        search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
+        search_box_entry.grid(row=0, column=0, padx=10)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
+        all_articles_table = CTkTable(all_articles_frame, values=all_articles_list, hover=True, column_hover=[3, 4, 5],
+                                      column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                      column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
+        all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
