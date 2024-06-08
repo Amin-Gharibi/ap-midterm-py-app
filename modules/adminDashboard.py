@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import filedialog
 import customtkinter as ctk
 from modules.userDashboard import UserDashboard
@@ -123,11 +124,13 @@ class AdminDashboard(ctk.CTkFrame):
         add_new_user_submit_btn = ctk.CTkButton(add_new_user_frame, text='Submit', height=30)
         add_new_user_submit_btn.grid(row=3, column=1, pady=(10, 0))
 
-        values = [['ID', 'Username', 'Full Name', 'Role', 'Approve', 'Reject'],
-                  ['0', 'amingharibi', 'Mohamad Amin Gharibi', 'Admin', 'Approve', 'Reject'],
-                  ['1', 'amin', 'Amin Gharibi', 'User', 'Approve', 'Reject'],
-                  ['2', 'gharibi', 'Mohamad Gharibi', 'Montaghed', 'Approve', 'Reject'],
-                  ['3', 'am_gh', 'MohamadAmin Gharibi', 'Admin', 'Approve', 'Reject']]
+        values = [
+            ['ID', 'Username', 'Full Name', 'Role', 'Approve', 'Reject'],
+            ['0', 'amingharibi', 'Mohamad Amin Gharibi', 'Admin', 'Approve', 'Reject'],
+            ['1', 'amin', 'Amin Gharibi', 'User', 'Approve', 'Reject'],
+            ['2', 'gharibi', 'Mohamad Gharibi', 'Montaghed', 'Approve', 'Reject'],
+            ['3', 'am_gh', 'MohamadAmin Gharibi', 'Admin', 'Approve', 'Reject']
+        ]
 
         # list of users waiting to be approved
         users_waiting_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
@@ -143,7 +146,14 @@ class AdminDashboard(ctk.CTkFrame):
         # list of all users
         all_users_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
         all_users_list_frame.grid(row=3, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
-        SectionTitle(all_users_list_frame, text='All Users').pack(anchor='w')
+        temp_frame = ctk.CTkFrame(all_users_list_frame, fg_color='transparent')
+        temp_frame.pack(expand=True, fill='x')
+        SectionTitle(temp_frame, text='All Users').pack(side=tkinter.LEFT)
+        search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
+        search_box_frame.pack(side=tkinter.RIGHT)
+        search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
+        search_box_entry.grid(row=0, column=0, padx=10)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
         all_users_table = CTkTable(master=all_users_list_frame, row=5, column=6, values=values,
                                    command=self.handle_approving_user, hover=True, column_hover=[4, 5],
                                    not_hover_rows=[0],
@@ -243,19 +253,28 @@ class AdminDashboard(ctk.CTkFrame):
         submit_form_buttons_frame = ctk.CTkFrame(movie_cast_frame, fg_color='transparent')
         submit_form_buttons_frame.grid(row=2, column=0, columnspan=3, pady=40)
         ctk.CTkButton(submit_form_buttons_frame, text='Create').grid(row=0, column=0)
-        ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350', hover_color='#C62828').grid(row=0, column=1, padx=30)
+        ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350', hover_color='#C62828').grid(
+            row=0, column=1, padx=30)
 
         all_movies_list = [
-            ['Name', 'Genre', 'Rate', 'Details', 'Edit', 'Delete'],
-            ['After Jendegi', 'Romance, Comedy', '4.3', 'Details', 'Edit', 'Delete'],
-            ['After Life', 'Action', '4.3', 'Details', 'Edit', 'Delete'],
-            ['After Zendegi', 'Drama', '4.3', 'Details', 'Edit', 'Delete']
+            ['Name', 'Rate', 'Status', 'Details', 'Edit', 'Delete'],
+            ['After Jendegi', '4.3', 'Published', 'Details', 'Edit', 'Delete'],
+            ['After Life', '4.1', 'Published', 'Details', 'Edit', 'Delete'],
+            ['After Zendegi', '0.0', 'Draft', 'Details', 'Edit', 'Delete']
         ]
 
         all_movies_frame = ctk.CTkFrame(parent, fg_color='transparent')
         all_movies_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
-        SectionTitle(all_movies_frame, text='All Movies').pack(padx=30, anchor='w')
-        all_movies_table = CTkTable(all_movies_frame, values=all_movies_list, hover=True, column_hover=[3, 4, 5], column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+        temp_frame = ctk.CTkFrame(all_movies_frame, fg_color='transparent')
+        temp_frame.pack(expand=True, fill='x')
+        SectionTitle(temp_frame, text='All Movies').pack(padx=30, side=tkinter.LEFT)
+        search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
+        search_box_frame.pack(padx=30, side=tkinter.RIGHT)
+        search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
+        search_box_entry.grid(row=0, column=0, padx=10)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
+        all_movies_table = CTkTable(all_movies_frame, values=all_movies_list, hover=True, column_hover=[3, 4, 5],
+                                    column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
                                     column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
         all_movies_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
 
