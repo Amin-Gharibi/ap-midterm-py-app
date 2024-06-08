@@ -36,8 +36,10 @@ class CTkTable(customtkinter.CTkFrame):
             hover: bool = False,
             justify: str = "center",
             wraplength: int = 1000,
-            column_hover: list = [],
-            not_hover_row: int = 0,
+            column_hover: list = None,
+            column_hover_text_color: list = None,
+            column_hover_bg_color: list = None,
+            not_hover_rows: list = None,
             **kwargs):
 
         super().__init__(master, fg_color="transparent")
@@ -61,8 +63,10 @@ class CTkTable(customtkinter.CTkFrame):
         self.write = write
         self.justify = justify
         self.binded_objects = []
-        self.column_hover = column_hover
-        self.not_hover_row = not_hover_row
+        self.column_hover = column_hover or []
+        self.column_hover_text_color = column_hover_text_color or []
+        self.column_hover_bg_color = column_hover_bg_color or []
+        self.not_hover_row = not_hover_rows or []
 
         if self.write:
             border_width = border_width = +1
@@ -91,7 +95,7 @@ class CTkTable(customtkinter.CTkFrame):
         self.fg_color = customtkinter.ThemeManager.theme["CTkFrame"]["fg_color"] if not self.colors[0] else self.colors[
             0]
         self.fg_color2 = customtkinter.ThemeManager.theme["CTkFrame"]["top_fg_color"] if not self.colors[1] else \
-        self.colors[1]
+            self.colors[1]
 
         if self.colors[0] is None and self.colors[1] is None:
             if self.fg_color == self.master.cget("fg_color"):
@@ -222,7 +226,7 @@ class CTkTable(customtkinter.CTkFrame):
                     args['font'] = ('Arial', 14, 'italic')
                     if args['text_color']:
                         del args['text_color']
-                    args['text_color'] = '#F57C00'
+                    args['text_color'] = self.column_hover_text_color[j - sorted(self.column_hover)[0]]
                 if i == 0:
                     args['font'] = ('Arial', 14, 'bold')
 
@@ -257,14 +261,11 @@ class CTkTable(customtkinter.CTkFrame):
                     if "anchor" not in args:
                         args["anchor"] = self.anchor
                     if "hover_color" not in args:
-                        if (j in self.column_hover) and i != self.not_hover_row:
-                            if j == self.column_hover[0]:
-                                args["hover_color"] = self.hover_color
-                            elif j == self.column_hover[1]:
-                                args['hover_color'] = '#B71C1C'
-                            else:
+                        if (j in self.column_hover) and i not in self.not_hover_row:
+                            try:
+                                args["hover_color"] = self.column_hover_bg_color[j % len(self.column_hover_bg_color)]
+                            except Exception:
                                 args["hover_color"] = args['fg_color']
-
                         else:
                             args["hover_color"] = args['fg_color']
                     if "hover" not in args:
@@ -327,8 +328,8 @@ class CTkTable(customtkinter.CTkFrame):
         frame.configure(background_corner_colors=corners, fg_color=fg)
         frame.bind("<Enter>", lambda e, x=i, y=j, color=hover_corners, fg=hv:
         self.frame[x, y].configure(background_corner_colors=color, fg_color=fg))
-        frame.bind("<Leave>", lambda e, x=i, y=j, color=corners, fg=fg:
-        self.frame[x, y].configure(background_corner_colors=color, fg_color=fg))
+        frame.bind("<Leave>", lambda e, x=i, y=j, color=corners, f=fg:
+        self.frame[x, y].configure(background_corner_colors=color, fg_color=f))
 
     def manipulate_data(self, row, column):
         """ entry callback """
