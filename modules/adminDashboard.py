@@ -57,8 +57,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.articles_button.grid(row=0, column=6, padx=20, pady=20)
 
         self.comments_button = ctk.CTkButton(navbar_frame, text="Comments",
-                                             command=lambda: user_dashboard.load_my_favorite_articles_tab(
-                                                 dynamic_content_frame, self))
+                                             command=lambda: self.load_comments_tab(dynamic_content_frame))
         self.comments_button.grid(row=0, column=7, padx=20, pady=20)
 
         # this frame would contain each tab's content
@@ -68,7 +67,6 @@ class AdminDashboard(ctk.CTkFrame):
         dynamic_content_frame.grid_columnconfigure((0, 1), weight=1)
 
         user_dashboard.load_my_profile_tab(dynamic_content_frame)
-        # self.load_users_tab(dynamic_content_frame)
 
     def load_users_tab(self, parent):
         from modules.plainInput import PlainInput
@@ -286,13 +284,13 @@ class AdminDashboard(ctk.CTkFrame):
         from modules.plainInput import PlainInput
 
         # disable target tab button and enable other tabs button
-        self.movies_button.configure(state='disabled')
+        self.articles_button.configure(state='disabled')
         self.my_profile_button.configure(state='normal')
         self.my_comments_button.configure(state='normal')
         self.my_favorite_movies_button.configure(state='normal')
         self.my_favorite_articles_button.configure(state='normal')
         self.users_button.configure(state='normal')
-        self.articles_button.configure(state='normal')
+        self.movies_button.configure(state='normal')
         self.comments_button.configure(state='normal')
 
         # empty widgets in the parent
@@ -352,6 +350,36 @@ class AdminDashboard(ctk.CTkFrame):
         search_box_entry.grid(row=0, column=0, padx=10)
         ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
         all_articles_table = CTkTable(all_articles_frame, values=all_articles_list, hover=True, column_hover=[3, 4, 5],
+                                      column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                      column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
+        all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+
+    def load_comments_tab(self, parent):
+        # disable target tab button and enable other tabs button
+        self.comments_button.configure(state='disabled')
+        self.my_profile_button.configure(state='normal')
+        self.my_comments_button.configure(state='normal')
+        self.my_favorite_movies_button.configure(state='normal')
+        self.my_favorite_articles_button.configure(state='normal')
+        self.users_button.configure(state='normal')
+        self.articles_button.configure(state='normal')
+        self.movies_button.configure(state='normal')
+
+        # empty widgets in the parent
+        for widget in parent.winfo_children():
+            widget.destroy()
+
+        all_waiting_comments = [
+            ['User', 'Page', 'Rate', 'Status', 'Body', 'Approve', 'Reject'],
+            ['MohamadAmin Gharibi', 'After Life', '4.5', 'Approved', 'See', 'Approve', 'Reject'],
+            ['Amin Gharibi', 'After Jendegi', '1.2', 'Rejected', 'See', 'Approve', 'Reject'],
+            ['Amir Testi', 'After Zendegi', '3.4', '--', 'See', 'Approve', 'Reject']
+        ]
+
+        all_waiting_comments_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        all_waiting_comments_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
+        SectionTitle(all_waiting_comments_frame, text='Comments Waiting List').pack(padx=30, anchor='w')
+        all_articles_table = CTkTable(all_waiting_comments_frame, values=all_waiting_comments, hover=True, column_hover=[4, 5, 6],
                                       column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
                                       column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
         all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)

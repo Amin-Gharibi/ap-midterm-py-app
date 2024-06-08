@@ -263,7 +263,7 @@ class CTkTable(customtkinter.CTkFrame):
                     if "hover_color" not in args:
                         if (j in self.column_hover) and i not in self.not_hover_row:
                             try:
-                                args["hover_color"] = self.column_hover_bg_color[j % len(self.column_hover_bg_color)]
+                                args["hover_color"] = self.column_hover_bg_color[j - sorted(self.column_hover)[0]]
                             except Exception:
                                 args["hover_color"] = args['fg_color']
                         else:
