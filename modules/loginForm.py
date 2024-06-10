@@ -58,6 +58,6 @@ class LoginForm(ctk.CTkFrame):
             identifier = self.identifier_entry.input.get()
             password = self.password_entry.input.get()
             self.destroy()
-            OTPForm(master=self.master, identifier=identifier, password=password).grid(column=0, row=0)
+            OTPForm(master=self.master, identifier=identifier, password=password, operation='login').grid(column=0, row=0)
         else:
             CTkMessagebox(title='Error', message=login_result['message'], icon='cancel')

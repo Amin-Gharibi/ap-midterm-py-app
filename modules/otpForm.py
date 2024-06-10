@@ -5,12 +5,18 @@ from CTkMessagebox import CTkMessagebox
 
 
 class OTPForm(ctk.CTkFrame):
-    def __init__(self, master, identifier, password, *args, **kwargs):
+    def __init__(self, master, identifier=None, username=None, email=None, password=None, fullName=None, role=None,
+                 operation=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.master = master
         self.identifier = identifier
+        self.username = username
+        self.email = email
         self.password = password
+        self.fullName = fullName
+        self.role = role
+        self.operation = operation
 
         self.configure(fg_color=master.cget("bg"))
 
@@ -38,7 +44,7 @@ class OTPForm(ctk.CTkFrame):
         self.interval_label.grid(row=3, column=0, sticky='e', pady=(10, 0))
 
         # submit button
-        self.submit_button = ctk.CTkButton(self, text="Login", width=150, height=30, command=self.login_handler)
+        self.submit_button = ctk.CTkButton(self, text="Confirm", width=150, height=30, command=self.operation_handler)
         self.submit_button.grid(row=4, column=0, pady=(15, 0))
 
         # go to log in first step page button
@@ -69,19 +75,37 @@ class OTPForm(ctk.CTkFrame):
             self.interval_label.grid(row=3, column=0, sticky='e', pady=(10, 0))
 
     def switch_to_login_first_step_handler(self):
-        from modules.loginForm import LoginForm
+        if self.operation == 'login':
+            from modules.loginForm import LoginForm
 
-        self.destroy()
+            self.destroy()
 
-        LoginForm(self.master).grid(row=0, column=0)
+            LoginForm(self.master).grid(row=0, column=0)
+        elif self.operation == 'signup':
+            from modules.signUpForm import SignUpForm
 
-    def login_handler(self):
-        from api_services.auth import validate_login_otp
+            self.destroy()
 
-        login_result = validate_login_otp(identifier=self.identifier, password=self.password,
-                                          code=self.otp_code_entry.input.get())
+            SignUpForm(self.master).grid(row=0, column=0)
 
-        if login_result and login_result['ok']:
+    def operation_handler(self):
+        login_result = None
+        signup_result = None
+
+        if self.operation == 'login':
+            from api_services.auth import validate_login_otp
+
+            login_result = validate_login_otp(identifier=self.identifier, password=self.password,
+                                              code=self.otp_code_entry.input.get())
+
+        elif self.operation == 'signup':
+            from api_services.auth import validate_register_otp
+
+            signup_result = validate_register_otp(fullName=self.fullName, email=self.email, username=self.username,
+                                                  password=self.password, role=self.role,
+                                                  code=self.otp_code_entry.input.get())
+
+        if (login_result and login_result['ok']) or (signup_result and signup_result['ok']):
             from api_services.auth import get_me
 
             user = get_me()
@@ -101,14 +125,29 @@ class OTPForm(ctk.CTkFrame):
             CTkMessagebox(title='Error', message=login_result['message'], icon='cancel')
 
     def resend_otp_handler(self):
-        from api_services.auth import login
+        if self.operation == 'login':
+            from api_services.auth import login
 
-        login_result = login(identifier=self.identifier, password=self.password)
-        if login_result and login_result['ok']:
-            self.minute.set("03")
-            self.second.set("00")
-            self.interval = 180
-            self.after(1000, self.update_timer)
-        else:
-            CTkMessagebox(title='Error', message="Error Occurred While Sending OTP Code! Please Try Again...",
-                          icon='cancel')
+            login_result = login(identifier=self.identifier, password=self.password)
+            if login_result and login_result['ok']:
+                self.minute.set("03")
+                self.second.set("00")
+                self.interval = 180
+                self.after(1000, self.update_timer)
+            else:
+                CTkMessagebox(title='Error', message="Error Occurred While Sending OTP Code! Please Try Again...",
+                              icon='cancel')
+
+        elif self.operation == 'signup':
+            from api_services.auth import register
+
+            signup_result = register(fullName=self.fullName, email=self.email, username=self.username,
+                                     password=self.password, role=self.role)
+            if signup_result and signup_result['ok']:
+                self.minute.set("03")
+                self.second.set("00")
+                self.interval = 180
+                self.after(1000, self.update_timer)
+            else:
+                CTkMessagebox(title='Error', message="Error Occurred While Sending OTP Code! Please Try Again...",
+                              icon='cancel')

@@ -3,7 +3,8 @@ from os import getenv
 from utils.util import save_access_token, get_access_token, error_handler
 
 
-def register(email: str,
+def register(fullName: str,
+             email: str,
              username: str,
              password: str,
              role: str):
@@ -12,12 +13,14 @@ def register(email: str,
 
         res = req.post(f'{getenv('BASE_URL')}/auth/register', json=sending_data)
 
-        return {"message": res.json()['message'] or 'Something Went Wrong!'}
+        return {"message": res.json()['message'] or 'Something Went Wrong!', "ok": res.ok}
     except Exception as e:
         error_handler(e)
+        return False
 
 
-def validate_register_otp(email: str,
+def validate_register_otp(fullName: str,
+                          email: str,
                           username: str,
                           password: str,
                           role: str,
@@ -30,7 +33,7 @@ def validate_register_otp(email: str,
         if res.status_code == 201:
             save_access_token(res.json()['accessToken'])
 
-        return {"message": res.json()['message'] or 'Something Went Wrong!'}
+        return {"message": res.json()['message'] or 'Something Went Wrong!', "ok": res.ok}
     except Exception as e:
         error_handler(e)
 
