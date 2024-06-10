@@ -67,7 +67,7 @@ def get_from_db(key: str):
         if value:
             return value
         else:
-            raise Exception("Key not found in db!")
+            return ""
     except Exception as e:
         error_handler(e, 'get_from_db')
         return None
@@ -87,4 +87,7 @@ def get_access_token():
     This function return stored access token in redis database
     :return: user access token
     """
-    return get_from_db('access_token').decode('utf-8')
+    try:
+        return get_from_db('access_token').decode('utf-8')
+    except Exception as e:
+        return ""

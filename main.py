@@ -4,6 +4,7 @@ import utils.util
 from mainScrollableFrame import MainScrollableFrame
 from modules.userDashboard import UserDashboard
 from modules.adminDashboard import AdminDashboard
+from api_services.auth import login, validate_login_otp
 
 # app width and height and other static variables
 APP_WIDTH = 1200

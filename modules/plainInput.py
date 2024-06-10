@@ -12,5 +12,5 @@ class PlainInput(ctk.CTkFrame):
         input_label.grid(row=0, column=0, sticky='w')
 
         # input placement
-        input_entry = ctk.CTkEntry(self, placeholder_text=input_placeholder, width=300, height=40)
-        input_entry.grid(row=1, column=0, sticky='ew')
+        self.input = ctk.CTkEntry(self, placeholder_text=input_placeholder, width=300, height=40)
+        self.input.grid(row=1, column=0, sticky='ew')

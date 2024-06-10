@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from modules.plainInput import PlainInput
+from CTkMessagebox import CTkMessagebox
 
 
 class LoginForm(ctk.CTkFrame):
@@ -16,16 +17,16 @@ class LoginForm(ctk.CTkFrame):
 
         # identifier field entry input
         self.identifier_entry = PlainInput(master=self, label_text="Email or Username:",
-                                           input_placeholder="Enter your Email or Username",)
+                                           input_placeholder="Enter your Email or Username", )
         self.identifier_entry.grid(row=1, column=0, pady=(40, 0))
 
         # password field entry input
-        self.identifier_entry = PlainInput(master=self, label_text="Password:",
-                                           input_placeholder="Enter your Password", )
-        self.identifier_entry.grid(row=2, column=0, pady=(10, 0))
+        self.password_entry = PlainInput(master=self, label_text="Password:",
+                                         input_placeholder="Enter your Password", )
+        self.password_entry.grid(row=2, column=0, pady=(10, 0))
 
         # submit button
-        self.submit_button = ctk.CTkButton(self, text="Login", width=150, height=30)
+        self.submit_button = ctk.CTkButton(self, text="Login", width=150, height=30, command=self.login_handler)
         self.submit_button.grid(row=3, column=0, pady=(15, 0))
 
         # go to signup page button
@@ -41,6 +42,22 @@ class LoginForm(ctk.CTkFrame):
         # destroy current page content
         self.destroy()
 
-        # load login page contents
-        sign_up_form = SignUpForm(master=self.master)
-        sign_up_form.grid(column=0, row=0)
+        # load sign up page contents
+        SignUpForm(master=self.master).grid(column=0, row=0)
+
+    def switch_to_otp_page(self):
+        # destroy current page content
+        self.destroy()
+
+    def login_handler(self):
+        from api_services.auth import login
+        from modules.otpForm import OTPForm
+        login_result = login(identifier=self.identifier_entry.input.get(), password=self.password_entry.input.get())
+
+        if login_result and login_result['ok']:
+            identifier = self.identifier_entry.input.get()
+            password = self.password_entry.input.get()
+            self.destroy()
+            OTPForm(master=self.master, identifier=identifier, password=password).grid(column=0, row=0)
+        else:
+            CTkMessagebox(title='Error', message=login_result['message'], icon='cancel')

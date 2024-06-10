@@ -3,3 +3,4 @@ tk
 pillow~=10.3.0
 redis
 requests
+CTkMessagebox
