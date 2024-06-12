@@ -1,34 +1,52 @@
 from tkinter import filedialog
 import customtkinter as ctk
+import requests
 from modules.plainInput import PlainInput
 from PIL import Image
+from api_services.auth import get_me
+from api_services.user import update_user
+from io import BytesIO
+from CTkMessagebox import CTkMessagebox
+from utils.util import log_out
 
 
 class UserDashboard(ctk.CTkFrame):
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master, second_parent=None, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         # configure page grid system
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
-        welcome_label = ctk.CTkLabel(self, text="Welcome Dear MohamadAmin Gharibi ", font=("Arial", 20, "italic"))
-        welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
+        self.second_parent = second_parent
+
+        self.data = get_me()
+
+        self.welcome_label = ctk.CTkButton(self, text=f"Welcome Dear {self.data['user']['fullName']} ",
+                                      fg_color='transparent', hover_color=self.cget('fg_color'),
+                                      font=("Arial", 20, "italic"), command=self.load_main_page)
+        self.welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
 
         # frame to hold the header navbar
         navbar_frame = ctk.CTkFrame(self)
         navbar_frame.grid(row=1, column=0, sticky='n', pady=5)
 
-        self.my_profile_button = ctk.CTkButton(navbar_frame, text="My Profile", command=lambda: self.load_my_profile_tab(dynamic_content_frame))
+        self.my_profile_button = ctk.CTkButton(navbar_frame, text="My Profile",
+                                               command=lambda: self.load_my_profile_tab(dynamic_content_frame))
         self.my_profile_button.grid(row=0, column=0, padx=20, pady=20)
 
-        self.my_comments_button = ctk.CTkButton(navbar_frame, text="My Comments", command=lambda: self.load_my_comments_tab(dynamic_content_frame))
+        self.my_comments_button = ctk.CTkButton(navbar_frame, text="My Comments",
+                                                command=lambda: self.load_my_comments_tab(dynamic_content_frame))
         self.my_comments_button.grid(row=0, column=1, padx=20, pady=20)
 
-        self.my_favorite_movies_button = ctk.CTkButton(navbar_frame, text="My Favorite Movies", command=lambda: self.load_my_favorite_movies_tab(dynamic_content_frame))
+        self.my_favorite_movies_button = ctk.CTkButton(navbar_frame, text="My Favorite Movies",
+                                                       command=lambda: self.load_my_favorite_movies_tab(
+                                                           dynamic_content_frame, self))
         self.my_favorite_movies_button.grid(row=0, column=2, padx=20, pady=20)
 
-        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Favorite Articles", command=lambda: self.load_my_favorite_articles_tab(dynamic_content_frame))
+        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Favorite Articles",
+                                                         command=lambda: self.load_my_favorite_articles_tab(
+                                                             dynamic_content_frame, self))
         self.my_favorite_articles_button.grid(row=0, column=3, padx=20, pady=20)
 
         # this frame would contain each tab's content
@@ -42,9 +60,14 @@ class UserDashboard(ctk.CTkFrame):
         self.load_my_profile_tab(dynamic_content_frame)
 
     def select_file(self):
-        file_name = filedialog.askopenfilename()
-        print(file_name)
-        return file_name
+        self.selected_profile_pic = filedialog.askopenfilename()
+        self.prof_image = Image.open(self.selected_profile_pic)
+        self.profile_pic_label.configure(image=ctk.CTkImage(dark_image=self.prof_image, size=(300, 300)))
+
+    def load_main_page(self):
+        from mainScrollableFrame import MainScrollableFrame
+        self.destroy()
+        MainScrollableFrame(self.master).grid(row=0, column=0, sticky='nsew')
 
     def load_my_profile_tab(self, parent, btn_container=None):
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
@@ -65,14 +88,17 @@ class UserDashboard(ctk.CTkFrame):
         left_content_frame = ctk.CTkFrame(parent, fg_color='transparent')
         left_content_frame.grid(row=0, column=0, sticky='nw')
 
-        username_entry = PlainInput(left_content_frame, "Username:", "Enter your username...")
-        username_entry.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
+        self.email_entry = PlainInput(left_content_frame, "Email:", "Enter your Email Address...")
+        self.email_entry.grid(row=0, column=0, sticky='nw', padx=100, pady=(40, 0))
+        self.email_entry.input.insert(0, self.data['user']['email'])
 
-        name_entry = PlainInput(left_content_frame, "Name:", "Enter your name...")
-        name_entry.grid(row=1, column=0, sticky='nw', padx=20)
+        self.username_entry = PlainInput(left_content_frame, "Username:", "Enter your username...")
+        self.username_entry.grid(row=1, column=0, sticky='nw', padx=100, pady=20)
+        self.username_entry.input.insert(0, self.data['user']['username'])
 
-        phone_number_entry = PlainInput(left_content_frame, "Phone Number:", "Enter your phone number...")
-        phone_number_entry.grid(row=2, column=0, sticky='nw', padx=20, pady=20)
+        self.name_entry = PlainInput(left_content_frame, "Name:", "Enter your name...")
+        self.name_entry.grid(row=2, column=0, sticky='nw', padx=100)
+        self.name_entry.input.insert(0, self.data['user']['fullName'])
 
         # frame to contain profile picture and its picker
         right_content_frame = ctk.CTkFrame(parent, fg_color='transparent')
@@ -80,14 +106,66 @@ class UserDashboard(ctk.CTkFrame):
         right_content_frame.grid_columnconfigure(0, weight=1)
 
         # Load the image
-        image = Image.open('images/imdb_logo.png')
-        profile_pic_label = ctk.CTkLabel(right_content_frame, text="",
-                                         image=ctk.CTkImage(dark_image=image, size=(300, 300)))
-        profile_pic_label.grid(row=0, column=0)
+        res = requests.get(self.data['user']['profilePic'])
+        self.prof_image = Image.open(BytesIO(res.content))
+        self.profile_pic_label = ctk.CTkLabel(right_content_frame, text="",
+                                              image=ctk.CTkImage(dark_image=self.prof_image, size=(300, 300)))
+        self.profile_pic_label.grid(row=0, column=0)
 
         pick_new_profile_button = ctk.CTkButton(right_content_frame, text="Select New Profile",
                                                 command=self.select_file)
         pick_new_profile_button.grid(row=1, column=0, pady=(20, 0))
+        self.selected_profile_pic = None
+
+        # update user details submit button
+        ctk.CTkButton(parent, text="Save", command=self.update_user).grid(row=1, column=0, columnspan=2, padx=100,
+                                                                          pady=40)
+
+        change_password_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        change_password_frame.grid(row=2, column=0, columnspan=2, sticky='ew')
+
+        self.current_password_entry = PlainInput(change_password_frame, label_text="Current Password:",
+                                                 input_placeholder="Enter Your Current Password...")
+        self.current_password_entry.grid(row=0, column=0, sticky='w', padx=100)
+
+        self.new_password_entry = PlainInput(change_password_frame, label_text="New Password:",
+                                             input_placeholder="Enter Your New Password...")
+        self.new_password_entry.grid(row=1, column=0, sticky='w', padx=100, pady=20)
+
+        ctk.CTkButton(change_password_frame, text="Change Password", command=self.update_password).grid(row=3, column=0, padx=100, sticky='w',
+                                                                          pady=(10, 60))
+
+    def update_user(self):
+        update_result = update_user(user_id=self.data['user']['_id'], email=self.email_entry.input.get(),
+                                    username=self.username_entry.input.get(),
+                                    fullName=self.name_entry.input.get(),
+                                    profilePic=self.selected_profile_pic)
+
+        if update_result['ok']:
+            CTkMessagebox(title="Success", message=update_result['message'], icon='check')
+            if self.second_parent:
+                self.second_parent.welcome_label.configure(text=f"Welcome Dear {update_result['updatedUser']['fullName']}")
+            else:
+                self.welcome_label.configure(text=f"Welcome Dear {update_result['updatedUser']['fullName']}")
+        else:
+            CTkMessagebox(title="Error", message=update_result['message'], icon='cancel')
+
+    def update_password(self):
+        update_result = update_user(user_id=self.data['user']['_id'], currentPassword=self.current_password_entry.input.get(),
+                                    updatingPassword=self.new_password_entry.input.get())
+
+        if update_result['ok']:
+            msg = CTkMessagebox(title="Success", message=update_result['message'], icon='check')
+            res = msg.get()
+            from modules.loginForm import LoginForm
+            if res.lower() == 'ok':
+                log_out()
+                if self.second_parent:
+                    self.second_parent.destroy()
+                self.destroy()
+                LoginForm(self.master).grid(row=0, column=0)
+        else:
+            CTkMessagebox(title="Error", message=update_result['message'], icon='cancel')
 
     def load_my_comments_tab(self, parent, btn_container=None):
         from modules.comment import Comment
@@ -148,11 +226,12 @@ class UserDashboard(ctk.CTkFrame):
             }
         ]
 
-        SectionTitle(parent, 'My Comments').grid(row=0, column=0, sticky='w', padx=20)
+        SectionTitle(parent, 'My Comments').grid(row=0, column=0, sticky='w', padx=30, pady=10)
 
         # create each comments template from the backend
         for index, comment in enumerate(comments):
-            Comment(parent, comment, fg_color='gray23').grid(row=index+1, column=0, columnspan=2, sticky='ew', padx=40, pady=20)
+            Comment(parent, comment, fg_color='gray23').grid(row=index + 1, column=0, columnspan=2, sticky='ew',
+                                                             padx=40, pady=20)
 
     def load_my_favorite_movies_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
@@ -278,7 +357,9 @@ class UserDashboard(ctk.CTkFrame):
         SectionTitle(holder_frame, text="Favorite Movies").grid(row=0, column=0, sticky='w', padx=20)
 
         for index, movie in enumerate(movies_details):
-            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(row=floor(index / 4) + 2, column=(index % 4), padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)
+            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(
+                row=floor(index / 4) + 2, column=(index % 4), padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10),
+                pady=10)
 
     def load_my_favorite_articles_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
@@ -376,4 +457,6 @@ class UserDashboard(ctk.CTkFrame):
         SectionTitle(holder_frame, text="Favorite Articles").grid(row=0, column=0, sticky='w', padx=20)
 
         for index, article in enumerate(articles):
-            ItemBox(master=holder_frame, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage, item=article).grid(row=floor(index / 4) + 2, column=(index % 4), padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)
+            ItemBox(master=holder_frame, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage,
+                    item=article).grid(row=floor(index / 4) + 2, column=(index % 4),
+                                       padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)

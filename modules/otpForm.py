@@ -105,24 +105,23 @@ class OTPForm(ctk.CTkFrame):
                                                   password=self.password, role=self.role,
                                                   code=self.otp_code_entry.input.get())
 
-        if (login_result and login_result['ok']) or (signup_result and signup_result['ok']):
-            from api_services.auth import get_me
-
-            user = get_me()
-            user = user and user['user']
+        if login_result and login_result['ok']:
+            from modules.userDashboard import UserDashboard
 
             self.destroy()
+            UserDashboard(master=self.master).grid(row=0, column=0, sticky='nsew')
+        elif signup_result and signup_result['ok']:
+            msg = CTkMessagebox(
+                title='Success',
+                message="Congratulations! You have successfully signed up, now you have to wait until admin approves your account. You are gonna be norified using email whenever you get approved!",
+                icon='check')
 
-            if user['role'] == 'ADMIN':
-                from modules.adminDashboard import AdminDashboard
+            if msg.get().lower() == 'ok':
+                from mainScrollableFrame import MainScrollableFrame
+                MainScrollableFrame(master=self.master).grid(row=0, column=0, sticky='nsew')
 
-                AdminDashboard(master=self.master).grid(row=0, column=0, sticky='nsew')
-            else:
-                from modules.userDashboard import UserDashboard
-
-                UserDashboard(master=self.master).grid(row=0, column=0, sticky='nsew')
         else:
-            CTkMessagebox(title='Error', message=login_result['message'], icon='cancel')
+            CTkMessagebox(title='Error', message=(login_result and login_result['message']) or (signup_result and signup_result['message']) or 'Something Went Wrong!', icon='cancel')
 
     def resend_otp_handler(self):
         if self.operation == 'login':

@@ -4,20 +4,25 @@ import customtkinter as ctk
 from modules.userDashboard import UserDashboard
 from modules.sectionTitle import SectionTitle
 from modules.ctktable import *
+from api_services.auth import get_me
 
 
 class AdminDashboard(ctk.CTkFrame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        user_dashboard = UserDashboard(master=None)
+        user_dashboard = UserDashboard(master=None, second_parent=self)
 
         # configure page grid system
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
-        welcome_label = ctk.CTkLabel(self, text="Welcome Dear MohamadAmin Gharibi ", font=("Arial", 20, "italic"))
-        welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
+        self.data = get_me()
+
+        self.welcome_label = ctk.CTkButton(self, text=f"Welcome Dear {self.data['user']['fullName']} ",
+                                      fg_color='transparent', hover_color=self.cget('fg_color'),
+                                      font=("Arial", 20, "italic"), command=user_dashboard.load_main_page)
+        self.welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
 
         # frame to hold the header navbar
         navbar_frame = ctk.CTkScrollableFrame(self, orientation='horizontal', height=60, width=800)

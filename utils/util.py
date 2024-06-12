@@ -48,7 +48,7 @@ def save_to_db(key: str, value: any, expiration_time: int = 0):
     r = connect_to_redis_db()
     try:
         if expiration_time:
-            r.set(key, value, ex=expiration_time*60)
+            r.set(key, value, ex=expiration_time*360)
         else:
             r.set(key, value)
     except Exception as e:
@@ -73,6 +73,19 @@ def get_from_db(key: str):
         return None
 
 
+def delete_from_db(key: str):
+    """
+    This function would get key of the target pair and delete the value from the redis database
+    :param key: target pair's key
+    :return: None
+    """
+    r = connect_to_redis_db()
+    try:
+        r.delete(key)
+    except Exception as e:
+        error_handler(e, 'delete_from_db')
+
+
 def save_access_token(access_token: str):
     """
     This function gets access_token and saves it to redis database
@@ -91,3 +104,14 @@ def get_access_token():
         return get_from_db('access_token').decode('utf-8')
     except Exception as e:
         return ""
+
+
+def log_out():
+    """
+    This function would delete the access token from redis db
+    :return: None
+    """
+    try:
+        delete_from_db('access_token')
+    except Exception as e:
+        error_handler(e, 'log_out')
