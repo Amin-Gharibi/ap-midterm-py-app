@@ -201,13 +201,18 @@ class UserDashboard(ctk.CTkFrame):
                                                                                   padx=40, pady=20)
 
         if not len(my_comments):
-            ctk.CTkLabel(parent, text='No Comments Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1, column=0, columnspan=2)
+            ctk.CTkLabel(parent, text='No Comments Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1,
+                                                                                                                  column=0,
+                                                                                                                  columnspan=2)
 
     def load_my_favorite_movies_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
         from modules.moviePage import MoviePage
         from math import floor
         from modules.sectionTitle import SectionTitle
+        from api_services.movies import get_favorite_movies
+
+        favorite_movies = get_favorite_movies()['allFavoriteMovies']
 
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
         if btn_container is None:
@@ -223,113 +228,17 @@ class UserDashboard(ctk.CTkFrame):
         for widget in parent.winfo_children():
             widget.destroy()
 
-        movies_details = [
-            {
-                "id": 0,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            },
-            {
-                "id": 1,
-                "title": "After Zendegi",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie.",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 4.5
-            },
-            {
-                "id": 2,
-                "title": "After Jendegi",
-                "description": "This movie is so amazing.",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 1.2
-            },
-            {
-                "id": 3,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            },
-            {
-                "id": 4,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            },
-            {
-                "id": 5,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            },
-            {
-                "id": 6,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            },
-            {
-                "id": 7,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            }
-        ]
-
         holder_frame = ctk.CTkFrame(parent, fg_color='transparent')
         holder_frame.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
         SectionTitle(holder_frame, text="Favorite Movies").grid(row=0, column=0, sticky='w', padx=20)
 
-        for index, movie in enumerate(movies_details):
+        for index, movie in enumerate(favorite_movies):
             ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(
                 row=floor(index / 4) + 2, column=(index % 4), padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10),
                 pady=10)
+
+        if not len(favorite_movies):
+            ctk.CTkLabel(parent, text='No Favorite Movies Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1, column=0, columnspan=2)
 
     def load_my_favorite_articles_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox

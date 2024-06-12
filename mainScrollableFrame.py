@@ -34,7 +34,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 0,
                 "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
+                "summary": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -46,7 +46,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 1,
                 "title": "After Zendegi",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie.",
+                "summary": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie.",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -58,7 +58,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 2,
                 "title": "After Jendegi",
-                "description": "This movie is so amazing.",
+                "summary": "This movie is so amazing.",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -70,7 +70,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 3,
                 "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
+                "summary": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -82,7 +82,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 4,
                 "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
+                "summary": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -94,7 +94,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 5,
                 "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
+                "summary": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -106,7 +106,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 6,
                 "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
+                "summary": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -118,7 +118,7 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             {
                 "id": 7,
                 "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
+                "summary": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
                 "cover": "images/imdb_logo.png",
                 "genre": "romance, comedy",
                 "releaseDate": "23/05/2024",
@@ -129,16 +129,16 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
             }
         ]
 
-        # format descriptions to add \n each 100 char
+        # format summarys to add \n each 100 char
         for item in movies_details:
-            item["description"] = format_description(item["description"])
+            item["summary"] = format_description(item["summary"])
 
         # create latest movies section
-        latest_movies_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
-                                                     title='Latest Movies',
-                                                     items=movies_details,
-                                                     details_page=MoviePage)
-        latest_movies_container.grid(row=2, column=0, sticky='ew')
+        # latest_movies_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
+        #                                              title='Latest Movies',
+        #                                              items=movies_details,
+        #                                              details_page=MoviePage)
+        # latest_movies_container.grid(row=2, column=0, sticky='ew')
 
         articles = [
             {
@@ -170,11 +170,11 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
         ]
 
         # create latest articles section
-        latest_articles_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
-                                                       title='Latest Articles',
-                                                       items=articles,
-                                                       details_page=ArticlePage)  # this must be changed later
-        latest_articles_container.grid(row=3, column=0, sticky='ew')
+        # latest_articles_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
+        #                                                title='Latest Articles',
+        #                                                items=articles,
+        #                                                details_page=ArticlePage)  # this must be changed later
+        # latest_articles_container.grid(row=3, column=0, sticky='ew')
 
         artists_details = [
             {
@@ -220,8 +220,8 @@ class MainScrollableFrame(ctk.CTkScrollableFrame):
         ]
 
         # create top artists section
-        top_artists_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
-                                                   title='Top Artists',
-                                                   items=artists_details,
-                                                   details_page=CastPage)
-        top_artists_container.grid(row=4, column=0, sticky='ew')
+        # top_artists_container = ItemBoxesContainer(master=self, target_fg_color=header_navbar.get_fg_color(),
+        #                                            title='Top Artists',
+        #                                            items=artists_details,
+        #                                            details_page=CastPage)
+        # top_artists_container.grid(row=4, column=0, sticky='ew')

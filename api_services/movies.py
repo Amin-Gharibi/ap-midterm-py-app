@@ -1,6 +1,6 @@
 from os import getenv
 import requests as req
-from utils.util import get_access_token
+from utils.util import get_access_token, error_handler
 
 
 def get_all_approved_movies():
@@ -94,3 +94,44 @@ def search_in_movies(q: str):
     res = req.get(f'{getenv("BASE_URL")}/movie/search?q={q}')
 
     return res.json()
+
+
+def get_favorite_movies():
+    try:
+        headers = {
+            'Authorization': f'Bearer {get_access_token()}'
+        }
+
+        res = req.get(f'{getenv("BASE_URL")}/favorite/movie', headers=headers)
+
+        return res.json()
+    except Exception as e:
+        error_handler(e)
+        return None
+
+def add_favorite_movie(movie_id: str):
+    try:
+        headers = {
+            'Authorization': f'Bearer {get_access_token()}'
+        }
+
+        res = req.post(f'{getenv("BASE_URL")}/favorite/movie', json={"movie": movie_id}, headers=headers)
+
+        return res.json()
+    except Exception as e:
+        error_handler(e)
+        return None
+
+
+def delete_favorite_movie(movie_id: str):
+    try:
+        headers = {
+            'Authorization': f'Bearer {get_access_token()}'
+        }
+
+        res = req.delete(f'{getenv("BASE_URL")}/favorite/movie', json={"movie": movie_id}, headers=headers)
+
+        return res.json()
+    except Exception as e:
+        error_handler(e)
+        return None
