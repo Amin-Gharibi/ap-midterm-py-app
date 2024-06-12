@@ -23,8 +23,8 @@ class UserDashboard(ctk.CTkFrame):
         self.data = get_me()
 
         self.welcome_label = ctk.CTkButton(self, text=f"Welcome Dear {self.data['user']['fullName']} ",
-                                      fg_color='transparent', hover_color=self.cget('fg_color'),
-                                      font=("Arial", 20, "italic"), command=self.load_main_page)
+                                           fg_color='transparent', hover_color=self.cget('fg_color'),
+                                           font=("Arial", 20, "italic"), command=self.load_main_page)
         self.welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
 
         # frame to hold the header navbar
@@ -132,8 +132,10 @@ class UserDashboard(ctk.CTkFrame):
                                              input_placeholder="Enter Your New Password...")
         self.new_password_entry.grid(row=1, column=0, sticky='w', padx=100, pady=20)
 
-        ctk.CTkButton(change_password_frame, text="Change Password", command=self.update_password).grid(row=3, column=0, padx=100, sticky='w',
-                                                                          pady=(10, 60))
+        ctk.CTkButton(change_password_frame, text="Change Password", command=self.update_password).grid(row=3, column=0,
+                                                                                                        padx=100,
+                                                                                                        sticky='w',
+                                                                                                        pady=(10, 60))
 
     def update_user(self):
         update_result = update_user(user_id=self.data['user']['_id'], email=self.email_entry.input.get(),
@@ -144,14 +146,16 @@ class UserDashboard(ctk.CTkFrame):
         if update_result['ok']:
             CTkMessagebox(title="Success", message=update_result['message'], icon='check')
             if self.second_parent:
-                self.second_parent.welcome_label.configure(text=f"Welcome Dear {update_result['updatedUser']['fullName']}")
+                self.second_parent.welcome_label.configure(
+                    text=f"Welcome Dear {update_result['updatedUser']['fullName']}")
             else:
                 self.welcome_label.configure(text=f"Welcome Dear {update_result['updatedUser']['fullName']}")
         else:
             CTkMessagebox(title="Error", message=update_result['message'], icon='cancel')
 
     def update_password(self):
-        update_result = update_user(user_id=self.data['user']['_id'], currentPassword=self.current_password_entry.input.get(),
+        update_result = update_user(user_id=self.data['user']['_id'],
+                                    currentPassword=self.current_password_entry.input.get(),
                                     updatingPassword=self.new_password_entry.input.get())
 
         if update_result['ok']:
@@ -170,6 +174,9 @@ class UserDashboard(ctk.CTkFrame):
     def load_my_comments_tab(self, parent, btn_container=None):
         from modules.comment import Comment
         from modules.sectionTitle import SectionTitle
+        from api_services.comment import get_my_comments
+
+        my_comments = get_my_comments()['userComments']
 
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
         if btn_container is None:
@@ -185,53 +192,16 @@ class UserDashboard(ctk.CTkFrame):
         for widget in parent.winfo_children():
             widget.destroy()
 
-        comments = [
-            {
-                'user': {
-                    'name': 'MohamadAmin Gharibi',
-                    'profile_pic': "images/imdb_logo.png",
-                    'role': 'User'
-                },
-                'body': 'hello world this is test first comment',
-                'rate': 7.5,
-                'responds': [
-                    {
-                        'user': {
-                            'name': 'MohamadAmin Gharibi',
-                            'profile_pic': "images/imdb_logo.png",
-                            'role': 'User'
-                        },
-                        'body': "hello world this is reply first test comment. isn't the UI beautiful? :)"
-                    }
-                ]
-            },
-            {
-                'user': {
-                    'name': 'RFE',
-                    'profile_pic': "images/imdb_logo.png",
-                    'role': 'User'
-                },
-                'body': 'hello world i am gay and this movie is the best of the best',
-                'rate': 1,
-                'responds': [
-                    {
-                        'user': {
-                            'name': 'MohamadAmin Gharibi',
-                            'profile_pic': "images/imdb_logo.png",
-                            'role': 'User'
-                        },
-                        'body': "koskholo nega 😂"
-                    }
-                ]
-            }
-        ]
-
         SectionTitle(parent, 'My Comments').grid(row=0, column=0, sticky='w', padx=30, pady=10)
 
         # create each comments template from the backend
-        for index, comment in enumerate(comments):
-            Comment(parent, comment, fg_color='gray23').grid(row=index + 1, column=0, columnspan=2, sticky='ew',
-                                                             padx=40, pady=20)
+        for index, comment in enumerate(my_comments):
+            Comment(parent, comment, fg_color='gray23', has_reply_btn=False).grid(row=index + 1, column=0, columnspan=2,
+                                                                                  sticky='ew',
+                                                                                  padx=40, pady=20)
+
+        if not len(my_comments):
+            ctk.CTkLabel(parent, text='No Comments Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1, column=0, columnspan=2)
 
     def load_my_favorite_movies_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
