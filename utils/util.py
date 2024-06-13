@@ -1,7 +1,6 @@
 import redis
 from os import getenv
 
-
 def format_description(description: str):
     """
     This function gets the whole description and each 100 chars it appends an \n
@@ -115,3 +114,14 @@ def log_out():
         delete_from_db('access_token')
     except Exception as e:
         error_handler(e, 'log_out')
+
+
+def is_admin():
+    try:
+        from api_services.auth import get_me
+        user = get_me()['user']
+
+        return True if user['role'] == 'ADMIN' else False
+    except Exception as e:
+        error_handler(e, 'is_admin')
+        return None

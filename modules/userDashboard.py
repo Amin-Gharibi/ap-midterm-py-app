@@ -1,6 +1,8 @@
+import tkinter
 from tkinter import filedialog
 import customtkinter as ctk
 import requests
+from modules.ctktable import CTkTable
 from modules.plainInput import PlainInput
 from PIL import Image
 from api_services.auth import get_me
@@ -44,7 +46,7 @@ class UserDashboard(ctk.CTkFrame):
                                                            dynamic_content_frame, self))
         self.my_favorite_movies_button.grid(row=0, column=2, padx=20, pady=20)
 
-        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Favorite Articles",
+        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="Articles",
                                                          command=lambda: self.load_my_favorite_articles_tab(
                                                              dynamic_content_frame, self))
         self.my_favorite_articles_button.grid(row=0, column=3, padx=20, pady=20)
@@ -59,7 +61,7 @@ class UserDashboard(ctk.CTkFrame):
 
         self.load_my_profile_tab(dynamic_content_frame)
 
-    def select_file(self):
+    def select_prof_pic(self):
         self.selected_profile_pic = filedialog.askopenfilename()
         self.prof_image = Image.open(self.selected_profile_pic)
         self.profile_pic_label.configure(image=ctk.CTkImage(dark_image=self.prof_image, size=(300, 300)))
@@ -113,7 +115,7 @@ class UserDashboard(ctk.CTkFrame):
         self.profile_pic_label.grid(row=0, column=0)
 
         pick_new_profile_button = ctk.CTkButton(right_content_frame, text="Select New Profile",
-                                                command=self.select_file)
+                                                command=self.select_prof_pic)
         pick_new_profile_button.grid(row=1, column=0, pady=(20, 0))
         self.selected_profile_pic = None
 
@@ -238,13 +240,22 @@ class UserDashboard(ctk.CTkFrame):
                 pady=10)
 
         if not len(favorite_movies):
-            ctk.CTkLabel(parent, text='No Favorite Movies Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1, column=0, columnspan=2)
+            ctk.CTkLabel(parent, text='No Favorite Movies Yet...', font=('Arial', 16, 'italic'),
+                         text_color='gray').grid(row=1, column=0, columnspan=2)
+
+    def select_article_cover(self):
+        self.selected_article_cover = filedialog.askopenfilename()
+        self.selected_cover_label.configure(text='Cover Selected Successfully!')
 
     def load_my_favorite_articles_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
         from modules.articlePage import ArticlePage
         from math import floor
         from modules.sectionTitle import SectionTitle
+        from api_services.articles import get_favorite_articles, get_my_articles
+
+        favorite_articles = get_favorite_articles()['allFavoriteArticles']
+        self.my_articles = get_my_articles()['userArticles']
 
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
         if btn_container is None:
@@ -260,82 +271,176 @@ class UserDashboard(ctk.CTkFrame):
         for widget in parent.winfo_children():
             widget.destroy()
 
-        is_admin = True
+        add_new_article_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        add_new_article_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        add_new_article_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
+        SectionTitle(add_new_article_frame, text='Add New Article').grid(row=0, column=0, sticky='w', padx=30,
+                                                                         pady=(0, 20))
+        self.article_title_entry = PlainInput(add_new_article_frame, label_text='Article Title:',
+                                              input_placeholder="Enter Article Title...")
+        self.article_title_entry.grid(row=1, column=0, sticky='w', padx=45)
+        article_body_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        article_body_frame.grid_columnconfigure(0, weight=1)
+        article_body_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=45, pady=10)
+        ctk.CTkLabel(article_body_frame, text='Article Body:', text_color='gray',
+                     font=("Arial", 12, 'italic')).grid(
+            row=0, column=0, sticky='w')
+        self.article_body_entry = ctk.CTkTextbox(article_body_frame)
+        self.article_body_entry.grid(row=1, column=0, sticky='ew')
+        self.selected_article_cover = None
+        article_cover_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        article_cover_frame.grid(row=3, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
+        ctk.CTkLabel(article_cover_frame, text='Article Cover:', text_color='gray',
+                     font=("Arial", 12, "italic")).grid(
+            row=0, column=0, sticky='w')
+        ctk.CTkButton(article_cover_frame, text='Add Cover', command=self.select_article_cover).grid(row=1,
+                                                                                                     column=0,
+                                                                                                     sticky='w')
+        self.selected_cover_label = ctk.CTkLabel(article_cover_frame,
+                                                 text='Please Select Article Cover')
+        self.selected_cover_label.grid(row=0, column=1, padx=20)
+        submit_form_buttons_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        submit_form_buttons_frame.grid(row=4, column=0, columnspan=3, pady=40)
+        ctk.CTkButton(submit_form_buttons_frame, text='Create',
+                      command=lambda: self.create_article_handler(isPublished=True)).grid(row=0, column=0)
+        ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350',
+                      hover_color='#C62828', command=lambda: self.create_article_handler(isPublished=False)).grid(
+            row=0, column=1, padx=30)
 
-        if not is_admin:
-            add_new_article_frame = ctk.CTkFrame(parent, fg_color='transparent')
-            add_new_article_frame.grid_columnconfigure((0, 1, 2), weight=1)
-            add_new_article_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
+        self.my_articles_holder = ctk.CTkFrame(parent, fg_color='transparent')
+        self.my_articles_holder.grid(row=1, column=0, sticky='nsew', padx=10, pady=10, columnspan=2)
+        SectionTitle(self.my_articles_holder, text='My Articles').pack(anchor='w', padx=20)
 
-            SectionTitle(add_new_article_frame, text='Add New Article').grid(row=0, column=0, sticky='w', padx=30,
-                                                                             pady=(0, 20))
-
-            title_input = PlainInput(add_new_article_frame, label_text='Article Title:',
-                                     input_placeholder="Enter Article Title...")
-            title_input.grid(row=1, column=0, sticky='w', padx=45)
-
-            article_body_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
-            article_body_frame.grid_columnconfigure(0, weight=1)
-            article_body_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=45, pady=10)
-            ctk.CTkLabel(article_body_frame, text='Article Body:', text_color='gray',
-                         font=("Arial", 12, 'italic')).grid(
-                row=0, column=0, sticky='w')
-            article_body_input = ctk.CTkTextbox(article_body_frame)
-            article_body_input.grid(row=1, column=0, sticky='ew')
-
-            article_cover = None
-            article_cover_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
-            article_cover_frame.grid(row=3, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
-            ctk.CTkLabel(article_cover_frame, text='Article Cover:', text_color='gray',
-                         font=("Arial", 12, "italic")).grid(
-                row=0, column=0, sticky='w')
-            ctk.CTkButton(article_cover_frame, text='Add Cover', command=self.select_file).grid(row=1, column=0,
-                                                                                                sticky='w')
-            selected_cover_count_label = ctk.CTkLabel(article_cover_frame,
-                                                      text=article_cover and 'Article Cover Has Been Selected!' or 'Please Select Article Cover')
-            selected_cover_count_label.grid(row=0, column=1, padx=20)
-
-            submit_form_buttons_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
-            submit_form_buttons_frame.grid(row=4, column=0, columnspan=3, pady=40)
-            ctk.CTkButton(submit_form_buttons_frame, text='Create').grid(row=0, column=0)
-            ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350',
-                          hover_color='#C62828').grid(
-                row=0, column=1, padx=30)
-
-        articles = [
-            {
-                "id": 0,
-                "title": "Article 1",
-                "cover": "images/imdb_logo.png",
-                "body": "this is bullshit body dude",
-                "author": {
-                    "id": 0,
-                    "fullName": "MohamadAmin Gharibi",
-                    "profilePic": "images/imdb_logo.png",
-                    "role": "User"
-                },
-                "rate": 2
-            },
-            {
-                "id": 0,
-                "title": "Article 2",
-                "cover": "images/imdb_logo.png",
-                "body": "this is kossher body dude",
-                "author": {
-                    "id": 0,
-                    "fullName": "MohamadAmin Gharibi",
-                    "profilePic": "images/imdb_logo.png",
-                    "role": "User"
-                },
-                "rate": 4.5
-            }
+        values = [
+            ['ID', 'Title', 'Body', 'Rate', 'Status', 'Change Status', 'Edit', 'Delete'],
+            *[
+                [
+                    '...' + article['_id'][-6:],
+                    article['title'],
+                    article['body'][:20] + '...',
+                    article['rate'] or '0',
+                    'Published' if article['isPublished'] else 'Not Published',
+                    'UnPublish' if article['isPublished'] else 'Publish',
+                    'Edit',
+                    'Delete'
+                ] for article in self.my_articles
+            ]
         ]
 
-        holder_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        holder_frame.grid(row=1, column=0, sticky="nsew", padx=10, pady=10)
-        SectionTitle(holder_frame, text="Favorite Articles").grid(row=0, column=0, sticky='w', padx=20)
+        self.my_articles_not_found_label = None
+        self.my_articles_table = None
+        # make these None so if there wasn't table or the label at the beginning and wanted
+        # to update the table there would be no need to destroy it
+        if len(values) > 1:
+            self.my_articles_table = CTkTable(master=self.my_articles_holder, column=8, values=values,
+                                              hover=True, column_hover=[5, 6, 7],
+                                              not_hover_rows=[0],
+                                              command=self.handle_clicking_on_article_table,
+                                              column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                              column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'])
+            self.my_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=30)
+        else:
+            self.my_articles_not_found_label = ctk.CTkLabel(self.my_articles_holder, text='No Articles Yet...',
+                                                            font=('Arial', 16, 'italic'),
+                                                            text_color='gray')
+            self.my_articles_not_found_label.pack()
 
-        for index, article in enumerate(articles):
-            ItemBox(master=holder_frame, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage,
+        favorite_articles_holder = ctk.CTkFrame(parent, fg_color='transparent')
+        favorite_articles_holder.grid(row=2, column=0, sticky="nsew", padx=10, pady=10, columnspan=2)
+        SectionTitle(favorite_articles_holder, text="Favorite Articles").grid(row=0, column=0, sticky='w', padx=20)
+
+        for index, article in enumerate(favorite_articles):
+            ItemBox(master=favorite_articles_holder, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage,
                     item=article).grid(row=floor(index / 4) + 2, column=(index % 4),
                                        padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)
+
+        if not len(favorite_articles):
+            ctk.CTkLabel(parent, text='No Favorite Articles Yet...', font=('Arial', 16, 'italic'),
+                         text_color='gray').grid(row=3, column=0, columnspan=2)
+
+    def create_article_handler(self, isPublished):
+        from api_services.articles import create_article, get_my_articles
+
+        if not self.article_title_entry.input.get() or not self.article_body_entry.get("1.0",
+                                                                                       tkinter.END) or not self.selected_article_cover:
+            CTkMessagebox(title='Error', message="Article Fields Can Not Be Empty!", icon='cancel')
+            return False
+
+        create_result = create_article(title=self.article_title_entry.input.get(),
+                                       body=self.article_body_entry.get("1.0", tkinter.END),
+                                       cover=self.selected_article_cover,
+                                       isPublished=isPublished)
+
+        if create_result['ok']:
+            CTkMessagebox(title='Success', message=f'Article {isPublished and 'Created' or 'Drafted'} Successfully!',
+                          icon='check')
+            self.update_my_articles_table()
+        else:
+            CTkMessagebox(title='Error', message=f"Error in {isPublished and 'Creating' or 'Drafting'} The Article!",
+                          icon='cancel')
+
+    def update_my_articles_table(self):
+        from api_services.articles import get_my_articles
+
+        self.my_articles = get_my_articles()['userArticles']
+
+        values = [
+            ['ID', 'Title', 'Body', 'Rate', 'Status', 'Change Status', 'Edit', 'Delete'],
+            *[
+                [
+                    '...' + article['_id'][-6:],
+                    article['title'],
+                    article['body'][:20] + '...',
+                    article['rate'] or '0',
+                    'Published' if article['isPublished'] else 'Not Published',
+                    'UnPublish' if article['isPublished'] else 'Publish',
+                    'Edit',
+                    'Delete'
+                ] for article in self.my_articles
+            ]
+        ]
+
+        if self.my_articles_table:
+            self.my_articles_table.destroy()
+        if self.my_articles_not_found_label:
+            self.my_articles_not_found_label.destroy()
+
+        if len(values) > 1:
+            self.my_articles_table = CTkTable(master=self.my_articles_holder, column=8, values=values,
+                                              hover=True, column_hover=[5, 6, 7],
+                                              not_hover_rows=[0],
+                                              command=self.handle_clicking_on_article_table,
+                                              column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                              column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'])
+            self.my_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=30)
+        else:
+            self.my_articles_not_found_label = ctk.CTkLabel(self.my_articles_holder, text='No Articles Yet...',
+                                                            font=('Arial', 16, 'italic'),
+                                                            text_color='gray')
+            self.my_articles_not_found_label.pack()
+
+    def handle_clicking_on_article_table(self, *args):
+        row = args[0]['row']
+        column = args[0]['column']
+        if row > 0:
+            if column == 4:
+                from api_services.articles import change_article_status
+
+                res = change_article_status(article_id=self.my_articles[row - 1]['_id'])
+                if res['ok']:
+                    CTkMessagebox(title='Success', message="Article Status Updated Successfully!", icon='check')
+                    self.update_my_articles_table()
+                else:
+                    CTkMessagebox(title='Error', message="Error In Changing Article Status!", icon='cancel')
+            elif column == 5:
+                # handle editing article
+                pass
+            elif column == 6:
+                from api_services.articles import delete_article
+
+                res = delete_article(article_id=self.my_articles[row - 1]['_id'])
+                if res['ok']:
+                    CTkMessagebox(title='Success', message="Article Deleted Successfully!", icon='check')
+                    self.update_my_articles_table()
+                else:
+                    CTkMessagebox(title='Error', message="Error In Deleting Article!", icon='cancel')

@@ -32,7 +32,7 @@ class ItemBox(tk.Frame):
         summary_label.grid(row=3, column=0, padx=15, sticky='w')
 
         # Rate label
-        rate_label = ctk.CTkLabel(self, text=f"{self.item.get('movie', self.item.get('article', 'cast'))['rate']} {'⭐' * int(self.item.get('movie', self.item.get('article', 'cast'))['rate'])}",
+        rate_label = ctk.CTkLabel(self, text=f"{self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0)} {'⭐' * int(self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0))}",
                                   fg_color=target_fg_color[1], font=("Arial", 12, 'italic'), text_color='yellow')
         rate_label.grid(row=4, column=0, padx=10, sticky="w")
 
