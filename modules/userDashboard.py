@@ -29,6 +29,8 @@ class UserDashboard(ctk.CTkFrame):
                                            font=("Arial", 20, "italic"), command=self.load_main_page)
         self.welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
 
+        ctk.CTkButton(self, text='Log Out', command=self.log_out_handler).grid(row=0, column=0, sticky='e', padx=50)
+
         # frame to hold the header navbar
         navbar_frame = ctk.CTkFrame(self)
         navbar_frame.grid(row=1, column=0, sticky='n', pady=5)
@@ -46,7 +48,7 @@ class UserDashboard(ctk.CTkFrame):
                                                            dynamic_content_frame, self))
         self.my_favorite_movies_button.grid(row=0, column=2, padx=20, pady=20)
 
-        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="Articles",
+        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Articles",
                                                          command=lambda: self.load_my_favorite_articles_tab(
                                                              dynamic_content_frame, self))
         self.my_favorite_articles_button.grid(row=0, column=3, padx=20, pady=20)
@@ -60,6 +62,12 @@ class UserDashboard(ctk.CTkFrame):
         dynamic_content_frame.grid_columnconfigure(1, weight=1)
 
         self.load_my_profile_tab(dynamic_content_frame)
+
+    def log_out_handler(self):
+        from mainScrollableFrame import MainScrollableFrame
+        log_out()
+        self.destroy()
+        MainScrollableFrame(master=self.master).grid(row=0, column=0, sticky='nsew')
 
     def select_prof_pic(self):
         self.selected_profile_pic = filedialog.askopenfilename()
@@ -81,6 +89,14 @@ class UserDashboard(ctk.CTkFrame):
         btn_container.my_comments_button.configure(state='normal')
         btn_container.my_favorite_movies_button.configure(state='normal')
         btn_container.my_favorite_articles_button.configure(state='normal')
+        if hasattr(btn_container, 'users_button'):
+            btn_container.users_button.configure(state='normal')
+        if hasattr(btn_container, 'movies_button'):
+            btn_container.movies_button.configure(state='normal')
+        if hasattr(btn_container, 'articles_button'):
+            btn_container.articles_button.configure(state='normal')
+        if hasattr(btn_container, 'comments_button'):
+            btn_container.comments_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -189,6 +205,14 @@ class UserDashboard(ctk.CTkFrame):
         btn_container.my_profile_button.configure(state='normal')
         btn_container.my_favorite_movies_button.configure(state='normal')
         btn_container.my_favorite_articles_button.configure(state='normal')
+        if hasattr(btn_container, 'users_button'):
+            btn_container.users_button.configure(state='normal')
+        if hasattr(btn_container, 'movies_button'):
+            btn_container.movies_button.configure(state='normal')
+        if hasattr(btn_container, 'articles_button'):
+            btn_container.articles_button.configure(state='normal')
+        if hasattr(btn_container, 'comments_button'):
+            btn_container.comments_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -225,6 +249,14 @@ class UserDashboard(ctk.CTkFrame):
         btn_container.my_profile_button.configure(state='normal')
         btn_container.my_comments_button.configure(state='normal')
         btn_container.my_favorite_articles_button.configure(state='normal')
+        if hasattr(btn_container, 'users_button'):
+            btn_container.users_button.configure(state='normal')
+        if hasattr(btn_container, 'movies_button'):
+            btn_container.movies_button.configure(state='normal')
+        if hasattr(btn_container, 'articles_button'):
+            btn_container.articles_button.configure(state='normal')
+        if hasattr(btn_container, 'comments_button'):
+            btn_container.comments_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -266,6 +298,14 @@ class UserDashboard(ctk.CTkFrame):
         btn_container.my_profile_button.configure(state='normal')
         btn_container.my_comments_button.configure(state='normal')
         btn_container.my_favorite_movies_button.configure(state='normal')
+        if hasattr(btn_container, 'users_button'):
+            btn_container.users_button.configure(state='normal')
+        if hasattr(btn_container, 'movies_button'):
+            btn_container.movies_button.configure(state='normal')
+        if hasattr(btn_container, 'articles_button'):
+            btn_container.articles_button.configure(state='normal')
+        if hasattr(btn_container, 'comments_button'):
+            btn_container.comments_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -423,7 +463,7 @@ class UserDashboard(ctk.CTkFrame):
         row = args[0]['row']
         column = args[0]['column']
         if row > 0:
-            if column == 4:
+            if column == 5:
                 from api_services.articles import change_article_status
 
                 res = change_article_status(article_id=self.my_articles[row - 1]['_id'])
@@ -432,10 +472,10 @@ class UserDashboard(ctk.CTkFrame):
                     self.update_my_articles_table()
                 else:
                     CTkMessagebox(title='Error', message="Error In Changing Article Status!", icon='cancel')
-            elif column == 5:
+            elif column == 6:
                 # handle editing article
                 pass
-            elif column == 6:
+            elif column == 7:
                 from api_services.articles import delete_article
 
                 res = delete_article(article_id=self.my_articles[row - 1]['_id'])

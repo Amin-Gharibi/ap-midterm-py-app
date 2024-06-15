@@ -24,6 +24,8 @@ class AdminDashboard(ctk.CTkFrame):
                                       font=("Arial", 20, "italic"), command=user_dashboard.load_main_page)
         self.welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
 
+        ctk.CTkButton(self, text='Log Out', command=user_dashboard.log_out_handler).grid(row=0, column=0, sticky='e', padx=50)
+
         # frame to hold the header navbar
         navbar_frame = ctk.CTkScrollableFrame(self, orientation='horizontal', height=60, width=800)
         navbar_frame.grid(row=1, column=0, sticky='n', pady=5)
@@ -44,7 +46,7 @@ class AdminDashboard(ctk.CTkFrame):
                                                            dynamic_content_frame, self))
         self.my_favorite_movies_button.grid(row=0, column=2, padx=20, pady=20)
 
-        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Favorite Articles",
+        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Articles",
                                                          command=lambda: user_dashboard.load_my_favorite_articles_tab(
                                                              dynamic_content_frame, self))
         self.my_favorite_articles_button.grid(row=0, column=3, padx=20, pady=20)

@@ -106,10 +106,15 @@ class OTPForm(ctk.CTkFrame):
                                                   code=self.otp_code_entry.input.get())
 
         if login_result and login_result['ok']:
-            from modules.userDashboard import UserDashboard
-
+            from api_services.auth import get_me
+            user = get_me()['user']
             self.destroy()
-            UserDashboard(master=self.master).grid(row=0, column=0, sticky='nsew')
+            if user and user['role'] == 'ADMIN':
+                from modules.adminDashboard import AdminDashboard
+                AdminDashboard(master=self.master).grid(row=0, column=0, sticky='nsew')
+            else:
+                from modules.userDashboard import UserDashboard
+                UserDashboard(master=self.master).grid(row=0, column=0, sticky='nsew')
         elif signup_result and signup_result['ok']:
             msg = CTkMessagebox(
                 title='Success',
