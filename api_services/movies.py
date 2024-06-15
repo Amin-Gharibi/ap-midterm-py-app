@@ -16,7 +16,7 @@ def get_all_movies():
 
     res = req.get(f'{getenv('BASE_URL')}/movie', headers=headers)
 
-    return res.json()
+    return {**res.json(), "ok": res.ok}
 
 
 def get_movie_by_id(movie_id):
@@ -77,7 +77,7 @@ def delete_movie_by_id(movie_id: str):
 
     res = req.delete(f'{getenv("BASE_URL")}/movie/{movie_id}', headers=headers)
 
-    return res.json()
+    return {**res.json(), "ok": res.ok}
 
 
 def change_movie_status_by_id(movie_id: str):
@@ -87,7 +87,7 @@ def change_movie_status_by_id(movie_id: str):
 
     res = req.put(f'{getenv("BASE_URL")}/movie/status/{movie_id}', headers=headers)
 
-    return res.json()
+    return {**res.json(), "ok": res.ok}
 
 
 def search_in_movies(q: str):

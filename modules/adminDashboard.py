@@ -111,19 +111,19 @@ class AdminDashboard(ctk.CTkFrame):
         SectionTitle(add_new_user_frame, text='Add New User ').grid(row=0, column=0, sticky='w', padx=10, pady=(0, 10))
 
         self.email_entry = PlainInput(master=add_new_user_frame, label_text='Email:',
-                                 input_placeholder="Enter user's Email Address...")
+                                      input_placeholder="Enter user's Email Address...")
         self.email_entry.grid(row=1, column=0)
 
         self.username_entry = PlainInput(master=add_new_user_frame, label_text='Username:',
-                                    input_placeholder="Enter user's Username...")
+                                         input_placeholder="Enter user's Username...")
         self.username_entry.grid(row=1, column=1)
 
         self.password_entry = PlainInput(master=add_new_user_frame, label_text='Password:',
-                                    input_placeholder="Enter user's Password...")
+                                         input_placeholder="Enter user's Password...")
         self.password_entry.grid(row=1, column=2)
 
         self.full_name_entry = PlainInput(master=add_new_user_frame, label_text='Full Name:',
-                                     input_placeholder="Enter user's Full Name...")
+                                          input_placeholder="Enter user's Full Name...")
         self.full_name_entry.grid(row=2, column=0, pady=10)
 
         role_frame = ctk.CTkFrame(add_new_user_frame, fg_color='transparent')
@@ -131,11 +131,12 @@ class AdminDashboard(ctk.CTkFrame):
         ctk.CTkLabel(role_frame, text="Role:", text_color='gray', font=("Arial", 12, 'italic')).grid(row=0, column=0,
                                                                                                      sticky='nw')
         self.role_entry = ctk.CTkOptionMenu(role_frame, width=300, height=40, values=["ADMIN", "USER", "CRITIC"],
-                                       fg_color=['#F9F9FA', '#343638'])
+                                            fg_color=['#F9F9FA', '#343638'])
         self.role_entry.set("Choose user's Role...")
         self.role_entry.grid(row=1, column=0, sticky='ew')
 
-        add_new_user_submit_btn = ctk.CTkButton(add_new_user_frame, text='Submit', height=30, command=self.handle_creating_user)
+        add_new_user_submit_btn = ctk.CTkButton(add_new_user_frame, text='Submit', height=30,
+                                                command=self.handle_creating_user)
         add_new_user_submit_btn.grid(row=3, column=1, pady=(10, 0))
 
         wait_list_values = [
@@ -200,7 +201,8 @@ class AdminDashboard(ctk.CTkFrame):
         search_box_frame.pack(side=tkinter.RIGHT)
         self.all_users_search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
         self.all_users_search_box_entry.grid(row=0, column=0, padx=10)
-        ctk.CTkButton(search_box_frame, text='Go!', width=60, command=self.handle_searching_in_users).grid(row=0, column=1)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60, command=self.handle_searching_in_users).grid(row=0,
+                                                                                                           column=1)
         self.all_users_table = None
         self.all_users_not_found_label = None
         if len(all_users_values) > 1:
@@ -385,6 +387,11 @@ class AdminDashboard(ctk.CTkFrame):
 
     def load_movies_tab(self, parent):
         from modules.plainInput import PlainInput
+        from api_services.movies import get_all_movies
+
+        self.all_movies = get_all_movies()
+        if self.all_movies['ok']:
+            self.all_movies = self.all_movies['allMovies']
 
         # disable target tab button and enable other tabs button
         self.movies_button.configure(state='disabled')
@@ -474,16 +481,24 @@ class AdminDashboard(ctk.CTkFrame):
         ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350', hover_color='#C62828').grid(
             row=0, column=1, padx=30)
 
-        all_movies_list = [
-            ['Name', 'Rate', 'Status', 'Details', 'Edit', 'Delete'],
-            ['After Jendegi', '4.3', 'Published', 'Details', 'Edit', 'Delete'],
-            ['After Life', '4.1', 'Published', 'Details', 'Edit', 'Delete'],
-            ['After Zendegi', '0.0', 'Draft', 'Details', 'Edit', 'Delete']
+        all_movies_values = [
+            ['ID', 'Name', 'Rate', 'Details', 'Status', 'Edit', 'Delete'],
+            *[
+                [
+                    '...' + movie['_id'][-6:],
+                    movie['fullName'],
+                    movie['rate'],
+                    'Details',
+                    'Published' if movie['isPublished'] else 'Not Published',
+                    'Edit',
+                    'Delete'
+                ] for movie in self.all_movies
+            ]
         ]
 
-        all_movies_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        all_movies_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
-        temp_frame = ctk.CTkFrame(all_movies_frame, fg_color='transparent')
+        self.all_movies_table_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        self.all_movies_table_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
+        temp_frame = ctk.CTkFrame(self.all_movies_table_frame, fg_color='transparent')
         temp_frame.pack(expand=True, fill='x')
         SectionTitle(temp_frame, text='All Movies').pack(padx=30, side=tkinter.LEFT)
         search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
@@ -491,10 +506,92 @@ class AdminDashboard(ctk.CTkFrame):
         search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
         search_box_entry.grid(row=0, column=0, padx=10)
         ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
-        all_movies_table = CTkTable(all_movies_frame, values=all_movies_list, hover=True, column_hover=[3, 4, 5],
-                                    column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
-                                    column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
-        all_movies_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        self.all_movies_table = None
+        self.movies_not_found_label = None
+        if len(all_movies_values) > 1:
+            self.all_movies_table = CTkTable(self.all_movies_table_frame, values=all_movies_values, hover=True,
+                                             column_hover=[3, 4, 5, 6],
+                                             command=self.handle_movies_funcs,
+                                             column_hover_text_color=['#F57C00', '#F57C00', '#F57C00', '#F57C00'],
+                                             column_hover_bg_color=['#1B5E20', '#1B5E20', '#1B5E20', '#B71C1C'],
+                                             not_hover_rows=[0])
+            self.all_movies_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        else:
+            self.movies_not_found_label = ctk.CTkLabel(self.all_movies_table_frame,
+                                                       text='No Movies Yet...',
+                                                       font=('Arial', 16, 'italic'),
+                                                       text_color='gray')
+            self.movies_not_found_label.pack()
+
+    def update_all_movies_table(self, search_result=None):
+        from api_services.movies import get_all_movies
+
+        self.all_movies = search_result if search_result else get_all_movies()
+
+        if not search_result and self.all_movies['ok']:
+            self.all_movies = self.all_movies['allMovies']
+
+        values = [
+            ['ID', 'Name', 'Rate', 'Details', 'Status', 'Edit', 'Delete'],
+            *[
+                [
+                    '...' + movie['_id'][-6:],
+                    movie['fullName'],
+                    movie['rate'],
+                    'Details',
+                    'Published' if movie['isPublished'] else 'Not Published',
+                    'Edit',
+                    'Delete'
+                ] for movie in self.all_movies
+            ]
+        ]
+
+        if self.all_movies_table:
+            self.all_movies_table.destroy()
+        if self.movies_not_found_label:
+            self.movies_not_found_label.destroy()
+
+        if len(values) > 1:
+            self.all_movies_table = CTkTable(master=self.all_movies_table_frame,
+                                             values=values,
+                                             command=self.handle_movies_funcs, hover=True, column_hover=[3, 4, 5, 6],
+                                             not_hover_rows=[0],
+                                             column_hover_text_color=['#F57C00', '#F57C00', '#F57C00', '#F57C00'],
+                                             column_hover_bg_color=['#1B5E20', '#1B5E20', '#B1B5E20', '#B71C1C'])
+            self.all_movies_table.pack(expand=True, fill='both', pady=(10, 0))
+        else:
+            self.movies_not_found_label = ctk.CTkLabel(self.all_movies_table_frame,
+                                                       text='No Movies Yet...',
+                                                       font=('Arial', 16, 'italic'),
+                                                       text_color='gray')
+            self.movies_not_found_label.pack()
+
+    def handle_movies_funcs(self, *args):
+        row = args[0]['row']
+        column = args[0]['column']
+        if row > 0:
+            if column == 3:
+                # handle showing details
+                pass
+            elif column == 4:
+                from api_services.movies import change_movie_status_by_id
+                change_result = change_movie_status_by_id(self.all_movies[row - 1]['_id'])
+                if change_result['ok']:
+                    CTkMessagebox(title='Success', message='Movie Status Changed Successfully!', icon='check')
+                    self.update_all_movies_table()
+                else:
+                    CTkMessagebox(title='Error', message='Failed To Change Movie Status!', icon='cancel')
+            elif column == 5:
+                # handle edit movie
+                pass
+            elif column == 6:
+                from api_services.movies import delete_movie_by_id
+                delete_result = delete_movie_by_id(self.all_movies[row-1]['_id'])
+                if delete_result['ok']:
+                    CTkMessagebox(title='Success', message='Movie Deleted Successfully!', icon='check')
+                    self.update_all_movies_table()
+                else:
+                    CTkMessagebox(title='Error', message='Failed To Delete Movie!', icon='cancel')
 
     def select_file(self):
         file_name = filedialog.askopenfilename()
