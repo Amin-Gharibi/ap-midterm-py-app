@@ -19,6 +19,26 @@ def register(fullName: str,
         return False
 
 
+def admin_register_user(fullName: str,
+                        email: str,
+                        username: str,
+                        password: str,
+                        role: str):
+    try:
+        sending_data = {key: value for key, value in locals().items()}
+
+        headers = {
+            'Authorization': f'Bearer {get_access_token()}'
+        }
+
+        res = req.post(f'{getenv('BASE_URL')}/auth/create', json=sending_data, headers=headers)
+
+        return {"message": res.json()['message'] or 'Something Went Wrong!', "ok": res.ok}
+    except Exception as e:
+        error_handler(e)
+        return False
+
+
 def validate_register_otp(fullName: str,
                           email: str,
                           username: str,

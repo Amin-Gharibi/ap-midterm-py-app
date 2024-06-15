@@ -5,6 +5,7 @@ from modules.userDashboard import UserDashboard
 from modules.sectionTitle import SectionTitle
 from modules.ctktable import *
 from api_services.auth import get_me
+from CTkMessagebox import CTkMessagebox
 
 
 class AdminDashboard(ctk.CTkFrame):
@@ -20,11 +21,12 @@ class AdminDashboard(ctk.CTkFrame):
         self.data = get_me()
 
         self.welcome_label = ctk.CTkButton(self, text=f"Welcome Dear {self.data['user']['fullName']} ",
-                                      fg_color='transparent', hover_color=self.cget('fg_color'),
-                                      font=("Arial", 20, "italic"), command=user_dashboard.load_main_page)
+                                           fg_color='transparent', hover_color=self.cget('fg_color'),
+                                           font=("Arial", 20, "italic"), command=user_dashboard.load_main_page)
         self.welcome_label.grid(row=0, column=0, sticky='nw', padx=20, pady=20)
 
-        ctk.CTkButton(self, text='Log Out', command=user_dashboard.log_out_handler).grid(row=0, column=0, sticky='e', padx=50)
+        ctk.CTkButton(self, text='Log Out', command=user_dashboard.log_out_handler).grid(row=0, column=0, sticky='e',
+                                                                                         padx=50)
 
         # frame to hold the header navbar
         navbar_frame = ctk.CTkScrollableFrame(self, orientation='horizontal', height=60, width=800)
@@ -77,6 +79,14 @@ class AdminDashboard(ctk.CTkFrame):
 
     def load_users_tab(self, parent):
         from modules.plainInput import PlainInput
+        from api_services.user import get_all_users, get_users_wait_list
+
+        self.all_users = get_all_users()
+        self.wait_list_users = get_users_wait_list()
+        if self.all_users['ok']:
+            self.all_users = self.all_users['users']
+        if self.wait_list_users['ok']:
+            self.wait_list_users = self.wait_list_users['waitListUsers']
 
         # disable target tab button and enable other tabs button
         self.users_button.configure(state='disabled')
@@ -100,74 +110,278 @@ class AdminDashboard(ctk.CTkFrame):
 
         SectionTitle(add_new_user_frame, text='Add New User ').grid(row=0, column=0, sticky='w', padx=10, pady=(0, 10))
 
-        email_entry = PlainInput(master=add_new_user_frame, label_text='Email:',
+        self.email_entry = PlainInput(master=add_new_user_frame, label_text='Email:',
                                  input_placeholder="Enter user's Email Address...")
-        email_entry.grid(row=1, column=0)
+        self.email_entry.grid(row=1, column=0)
 
-        username_entry = PlainInput(master=add_new_user_frame, label_text='Username:',
+        self.username_entry = PlainInput(master=add_new_user_frame, label_text='Username:',
                                     input_placeholder="Enter user's Username...")
-        username_entry.grid(row=1, column=1)
+        self.username_entry.grid(row=1, column=1)
 
-        password_entry = PlainInput(master=add_new_user_frame, label_text='Password:',
+        self.password_entry = PlainInput(master=add_new_user_frame, label_text='Password:',
                                     input_placeholder="Enter user's Password...")
-        password_entry.grid(row=1, column=2)
+        self.password_entry.grid(row=1, column=2)
 
-        full_name_entry = PlainInput(master=add_new_user_frame, label_text='Full Name:',
+        self.full_name_entry = PlainInput(master=add_new_user_frame, label_text='Full Name:',
                                      input_placeholder="Enter user's Full Name...")
-        full_name_entry.grid(row=2, column=0, pady=10)
+        self.full_name_entry.grid(row=2, column=0, pady=10)
 
         role_frame = ctk.CTkFrame(add_new_user_frame, fg_color='transparent')
         role_frame.grid(row=2, column=1, pady=10)
         ctk.CTkLabel(role_frame, text="Role:", text_color='gray', font=("Arial", 12, 'italic')).grid(row=0, column=0,
                                                                                                      sticky='nw')
-        role_entry = ctk.CTkOptionMenu(role_frame, width=300, height=40, values=["test2", "test3"],
+        self.role_entry = ctk.CTkOptionMenu(role_frame, width=300, height=40, values=["ADMIN", "USER", "CRITIC"],
                                        fg_color=['#F9F9FA', '#343638'])
-        role_entry.set("Choose user's Role...")
-        role_entry.grid(row=1, column=0, sticky='ew')
+        self.role_entry.set("Choose user's Role...")
+        self.role_entry.grid(row=1, column=0, sticky='ew')
 
-        add_new_user_submit_btn = ctk.CTkButton(add_new_user_frame, text='Submit', height=30)
+        add_new_user_submit_btn = ctk.CTkButton(add_new_user_frame, text='Submit', height=30, command=self.handle_creating_user)
         add_new_user_submit_btn.grid(row=3, column=1, pady=(10, 0))
 
-        values = [
-            ['ID', 'Username', 'Full Name', 'Role', 'Approve', 'Reject'],
-            ['0', 'amingharibi', 'Mohamad Amin Gharibi', 'Admin', 'Approve', 'Reject'],
-            ['1', 'amin', 'Amin Gharibi', 'User', 'Approve', 'Reject'],
-            ['2', 'gharibi', 'Mohamad Gharibi', 'Montaghed', 'Approve', 'Reject'],
-            ['3', 'am_gh', 'MohamadAmin Gharibi', 'Admin', 'Approve', 'Reject']
+        wait_list_values = [
+            ['ID', 'Email', 'Username', 'Full Name', 'Role', 'Approve', 'Reject'],
+            *[
+                [
+                    '...' + user['_id'][-6:],
+                    user['email'],
+                    user['username'],
+                    user['fullName'],
+                    user['role'],
+                    'Approve',
+                    'Reject'
+                ] for user in self.wait_list_users
+            ]
+        ]
+
+        all_users_values = [
+            ['ID', 'Email', 'Username', 'Full Name', 'Role', 'Edit', 'Delete', 'Ban'],
+            *[
+                [
+                    '...' + user['_id'][-6:],
+                    user['email'],
+                    user['username'],
+                    user['fullName'],
+                    user['role'],
+                    'Edit',
+                    'Delete',
+                    'Ban' if not user['isBanned'] else 'UnBan'
+                ] for user in self.all_users
+            ]
         ]
 
         # list of users waiting to be approved
-        users_waiting_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        users_waiting_list_frame.grid(row=2, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
-        SectionTitle(users_waiting_list_frame, text="Users Wait-List").pack(anchor='w')
-        wait_list_table = CTkTable(master=users_waiting_list_frame, row=5, column=6, values=values,
-                                   command=self.handle_approving_user, hover=True, column_hover=[4, 5],
-                                   not_hover_rows=[0],
-                                   column_hover_text_color=['#F57C00', '#F57C00'],
-                                   column_hover_bg_color=['#1B5E20', '#B71C1C'])
-        wait_list_table.pack(expand=True, fill='both', pady=(10, 0))
+        self.users_waiting_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        self.users_waiting_list_frame.grid(row=2, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
+        SectionTitle(self.users_waiting_list_frame, text="Users Wait-List").pack(anchor='w')
+        self.users_wait_list_table = None
+        self.users_wait_list_not_found_label = None
+        if len(wait_list_values) > 1:
+            self.users_wait_list_table = CTkTable(master=self.users_waiting_list_frame, column=7,
+                                                  values=wait_list_values,
+                                                  command=self.handle_approving_user, hover=True, column_hover=[5, 6],
+                                                  not_hover_rows=[0],
+                                                  column_hover_text_color=['#F57C00', '#F57C00'],
+                                                  column_hover_bg_color=['#1B5E20', '#B71C1C'])
+            self.users_wait_list_table.pack(expand=True, fill='both', pady=(10, 0))
+        else:
+            self.users_wait_list_not_found_label = ctk.CTkLabel(self.users_waiting_list_frame,
+                                                                text='No Users In Wait List...',
+                                                                font=('Arial', 16, 'italic'),
+                                                                text_color='gray')
+            self.users_wait_list_not_found_label.pack()
 
         # list of all users
-        all_users_list_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        all_users_list_frame.grid(row=3, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
-        temp_frame = ctk.CTkFrame(all_users_list_frame, fg_color='transparent')
+        self.all_users_table_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        self.all_users_table_frame.grid(row=3, column=0, columnspan=2, sticky='ew', padx=20, pady=(50, 0))
+        temp_frame = ctk.CTkFrame(self.all_users_table_frame, fg_color='transparent')
         temp_frame.pack(expand=True, fill='x')
         SectionTitle(temp_frame, text='All Users').pack(side=tkinter.LEFT)
         search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
         search_box_frame.pack(side=tkinter.RIGHT)
-        search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
-        search_box_entry.grid(row=0, column=0, padx=10)
-        ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
-        all_users_table = CTkTable(master=all_users_list_frame, row=5, column=6, values=values,
-                                   command=self.handle_approving_user, hover=True, column_hover=[4, 5],
-                                   not_hover_rows=[0],
-                                   column_hover_text_color=['#F57C00', '#F57C00'],
-                                   column_hover_bg_color=['#1B5E20', '#B71C1C'])
-        all_users_table.pack(expand=True, fill='both', pady=(10, 0))
+        self.all_users_search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
+        self.all_users_search_box_entry.grid(row=0, column=0, padx=10)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60, command=self.handle_searching_in_users).grid(row=0, column=1)
+        self.all_users_table = None
+        self.all_users_not_found_label = None
+        if len(all_users_values) > 1:
+            self.all_users_table = CTkTable(master=self.all_users_table_frame,
+                                            values=all_users_values,
+                                            command=self.handle_all_users_funcs, hover=True, column_hover=[5, 6, 7],
+                                            not_hover_rows=[0],
+                                            column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                            column_hover_bg_color=['#1B5E20', '#B71C1C', '#B71C1C'])
+            self.all_users_table.pack(expand=True, fill='both', pady=(10, 0))
+        else:
+            self.all_users_not_found_label = ctk.CTkLabel(self.all_users_table_frame,
+                                                          text='No Users Yet...',
+                                                          font=('Arial', 16, 'italic'),
+                                                          text_color='gray')
+            self.all_users_not_found_label.pack()
 
-    def handle_approving_user(self, *kwargs):
-        if kwargs[0]['row'] > 0 and kwargs[0]['column'] == 4:
-            print('approved')
+    def handle_creating_user(self):
+        from api_services.auth import admin_register_user
+        create_result = admin_register_user(
+            fullName=self.full_name_entry.input.get(),
+            username=self.username_entry.input.get(),
+            email=self.email_entry.input.get(),
+            password=self.password_entry.input.get(),
+            role=self.role_entry.get()
+        )
+        if create_result['ok']:
+            CTkMessagebox(title='Success', message='User Created Successfully!', icon='check')
+            self.update_users_wait_list_table()
+        else:
+            CTkMessagebox(title='Error', message=create_result['message'], icon='cancel')
+
+    def handle_searching_in_users(self):
+        from api_services.user import search_user
+        search_result = search_user(self.all_users_search_box_entry.get())
+        if search_result['ok']:
+            self.update_all_users_table(search_result=search_result['result'])
+        else:
+            CTkMessagebox(title='Error', message='Failed To Search In Users', icon='cancel')
+
+    def update_users_wait_list_table(self):
+        from api_services.user import get_users_wait_list
+
+        self.wait_list_users = get_users_wait_list()
+
+        if self.wait_list_users['ok']:
+            self.wait_list_users = self.wait_list_users['waitListUsers']
+
+        values = [
+            ['ID', 'Email', 'Username', 'Full Name', 'Role', 'Approve', 'Reject'],
+            *[
+                [
+                    '...' + user['_id'][-6:],
+                    user['email'],
+                    user['username'],
+                    user['fullName'],
+                    user['role'],
+                    'Approve',
+                    'Reject'
+                ] for user in self.wait_list_users
+            ]
+        ]
+
+        if self.users_wait_list_table:
+            self.users_wait_list_table.destroy()
+        if self.users_wait_list_not_found_label:
+            self.users_wait_list_not_found_label.destroy()
+
+        if len(values) > 1:
+            self.users_wait_list_table = CTkTable(master=self.users_waiting_list_frame, column=7,
+                                                  values=values,
+                                                  command=self.handle_approving_user, hover=True, column_hover=[5, 6],
+                                                  not_hover_rows=[0],
+                                                  column_hover_text_color=['#F57C00', '#F57C00'],
+                                                  column_hover_bg_color=['#1B5E20', '#B71C1C'])
+            self.users_wait_list_table.pack(expand=True, fill='both', pady=(10, 0))
+        else:
+            self.users_wait_list_not_found_label = ctk.CTkLabel(self.users_waiting_list_frame,
+                                                                text='No User In Wait List...',
+                                                                font=('Arial', 16, 'italic'),
+                                                                text_color='gray')
+            self.users_wait_list_not_found_label.pack()
+
+    def update_all_users_table(self, search_result=None):
+        from api_services.user import get_all_users
+
+        self.all_users = search_result if search_result else get_all_users()
+
+        if not search_result and self.all_users['ok']:
+            self.all_users = self.all_users['users']
+
+        values = [
+            ['ID', 'Email', 'Username', 'Full Name', 'Role', 'Edit', 'Delete', 'Ban'],
+            *[
+                [
+                    '...' + user['_id'][-6:],
+                    user['email'],
+                    user['username'],
+                    user['fullName'],
+                    user['role'],
+                    'Edit',
+                    'Delete',
+                    'Ban' if not user['isBanned'] else 'UnBan'
+                ] for user in self.all_users
+            ]
+        ]
+
+        if self.all_users_table:
+            self.all_users_table.destroy()
+        if self.all_users_not_found_label:
+            self.all_users_not_found_label.destroy()
+
+        if len(values) > 1:
+            self.all_users_table = CTkTable(master=self.all_users_table_frame,
+                                            values=values,
+                                            command=self.handle_all_users_funcs, hover=True, column_hover=[5, 6, 7],
+                                            not_hover_rows=[0],
+                                            column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                            column_hover_bg_color=['#1B5E20', '#B71C1C', '#B71C1C'])
+            self.all_users_table.pack(expand=True, fill='both', pady=(10, 0))
+        else:
+            self.all_users_not_found_label = ctk.CTkLabel(self.all_users_table_frame,
+                                                          text='No Users Yet...',
+                                                          font=('Arial', 16, 'italic'),
+                                                          text_color='gray')
+            self.all_users_not_found_label.pack()
+
+    def handle_approving_user(self, *args):
+        row = args[0]['row']
+        column = args[0]['column']
+        if row > 0:
+            if column == 5:
+                from api_services.user import approve_user
+                approve_result = approve_user(self.wait_list_users[row - 1]['_id'])
+                if approve_result['ok']:
+                    CTkMessagebox(title='Success', message='User Was Approved Successfully!', icon='check')
+                    self.update_users_wait_list_table()
+                    self.update_all_users_table()
+                else:
+                    CTkMessagebox(title='Error', message='Failed To Approve User!', icon='cancel')
+            if column == 6:
+                from api_services.user import reject_user
+                reject_result = reject_user(self.wait_list_users[row - 1]['_id'])
+                if reject_result['ok']:
+                    CTkMessagebox(title='Success', message='User Was Rejected Successfully!', icon='check')
+                    self.update_users_wait_list_table()
+                else:
+                    CTkMessagebox(title='Error', message='Failed To Reject User!', icon='cancel')
+
+    def handle_all_users_funcs(self, *args):
+        row = args[0]['row']
+        column = args[0]['column']
+        if row > 0:
+            if column == 5:
+                # handle editing user
+                pass
+            if column == 6:
+                from api_services.user import delete_user
+                delete_result = delete_user(self.all_users[row - 1]['_id'])
+                if delete_result['ok']:
+                    CTkMessagebox(title='Success', message='User Was Deleted Successfully!', icon='check')
+                    self.update_all_users_table()
+                else:
+                    CTkMessagebox(title='Error', message='Failed To Delete User!', icon='cancel')
+            if column == 7:
+                if self.all_users[row - 1]['isBanned']:
+                    from api_services.user import unban_user
+                    unban_result = unban_user(self.all_users[row - 1]['_id'])
+                    if unban_result['ok']:
+                        CTkMessagebox(title='Success', message='User Was Unbanned Successfully!', icon='check')
+                        self.update_all_users_table()
+                    else:
+                        CTkMessagebox(title='Error', message='Failed To Unban User!', icon='cancel')
+                else:
+                    from api_services.user import ban_user
+                    ban_result = ban_user(self.all_users[row - 1]['_id'])
+                    if ban_result['ok']:
+                        CTkMessagebox(title='Success', message='User Was Banned Successfully!', icon='check')
+                        self.update_all_users_table()
+                    else:
+                        CTkMessagebox(title='Error', message='Failed To Ban User!', icon='cancel')
 
     def load_movies_tab(self, parent):
         from modules.plainInput import PlainInput
@@ -386,7 +600,8 @@ class AdminDashboard(ctk.CTkFrame):
         all_waiting_comments_frame = ctk.CTkFrame(parent, fg_color='transparent')
         all_waiting_comments_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
         SectionTitle(all_waiting_comments_frame, text='Comments Waiting List').pack(padx=30, anchor='w')
-        all_articles_table = CTkTable(all_waiting_comments_frame, values=all_waiting_comments, hover=True, column_hover=[4, 5, 6],
+        all_articles_table = CTkTable(all_waiting_comments_frame, values=all_waiting_comments, hover=True,
+                                      column_hover=[4, 5, 6],
                                       column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
                                       column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
         all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
