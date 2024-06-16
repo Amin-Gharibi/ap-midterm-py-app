@@ -97,6 +97,8 @@ class UserDashboard(ctk.CTkFrame):
             btn_container.articles_button.configure(state='normal')
         if hasattr(btn_container, 'comments_button'):
             btn_container.comments_button.configure(state='normal')
+        if hasattr(btn_container, 'casts_button'):
+            btn_container.casts_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -213,6 +215,8 @@ class UserDashboard(ctk.CTkFrame):
             btn_container.articles_button.configure(state='normal')
         if hasattr(btn_container, 'comments_button'):
             btn_container.comments_button.configure(state='normal')
+        if hasattr(btn_container, 'casts_button'):
+            btn_container.casts_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -257,6 +261,8 @@ class UserDashboard(ctk.CTkFrame):
             btn_container.articles_button.configure(state='normal')
         if hasattr(btn_container, 'comments_button'):
             btn_container.comments_button.configure(state='normal')
+        if hasattr(btn_container, 'casts_button'):
+            btn_container.casts_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():
@@ -306,6 +312,8 @@ class UserDashboard(ctk.CTkFrame):
             btn_container.articles_button.configure(state='normal')
         if hasattr(btn_container, 'comments_button'):
             btn_container.comments_button.configure(state='normal')
+        if hasattr(btn_container, 'casts_button'):
+            btn_container.casts_button.configure(state='normal')
 
         # empty widgets in the parent
         for widget in parent.winfo_children():

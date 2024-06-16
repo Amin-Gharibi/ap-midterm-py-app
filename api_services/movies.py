@@ -34,17 +34,28 @@ def create_movie(fullName: str,
                  budget: str,
                  cover: str,
                  medias: list,
-                 cast: list):
+                 cast: list,
+                 isPublished: bool):
+    try:
+        sending_data = {key: value for key, value in locals().items()}
 
-    sending_data = {key: value for key, value in locals().items()}
+        headers = {
+            "Authorization": f"Bearer {get_access_token()}"
+        }
 
-    headers = {
-        'Authorization': f'Bearer {get_access_token()}'
-    }
+        files = {
+            "cover": open(cover, 'rb'),
+        }
 
-    res = req.post(f'{getenv("BASE_URL")}/movie', json=sending_data, headers=headers)
+        for index, media in enumerate(medias):
+            files[f"medias[{index}]"] = open(media, 'rb')
 
-    return res.json()
+        res = req.post(f"{getenv('BASE_URL')}/movie", json=sending_data, files=files, headers=headers)
+
+        return {**res.json(), "ok": res.ok}
+    except Exception as e:
+        error_handler(e)
+        return None
 
 
 def update_movie_by_id(movie_id: str,
@@ -57,43 +68,66 @@ def update_movie_by_id(movie_id: str,
                        budget: str = None,
                        cover: str = None,
                        medias: list = None,
-                       cast: list = None):
+                       cast: list = None,
+                       isPublished: bool = None):
+    try:
+        sending_data = {key: value for key, value in locals().items()}
 
-    sending_data = {key: value for key, value in locals().items() if key != 'movie_id' and value is not None}
+        headers = {
+            "Authorization": f"Bearer {get_access_token()}"
+        }
 
-    headers = {
-        'Authorization': f'Bearer {get_access_token()}'
-    }
+        files = {
+            "cover": open(cover, 'rb'),
+        }
 
-    res = req.put(f'{getenv("BASE_URL")}/movie/{movie_id}', json=sending_data, headers=headers)
+        for index, media in enumerate(medias):
+            files[f"medias[{index}]"] = open(media, 'rb')
 
-    return res.json()
+        res = req.post(f"{getenv('BASE_URL')}/movie/{movie_id}", json=sending_data, files=files, headers=headers)
+
+        return {**res.json(), "ok": res.ok}
+    except Exception as e:
+        error_handler(e)
+        return None
 
 
 def delete_movie_by_id(movie_id: str):
-    headers = {
-        'Authorization': f'Bearer {get_access_token()}'
-    }
+    try:
+        headers = {
+            'Authorization': f'Bearer {get_access_token()}'
+        }
 
-    res = req.delete(f'{getenv("BASE_URL")}/movie/{movie_id}', headers=headers)
+        res = req.delete(f'{getenv("BASE_URL")}/movie/{movie_id}', headers=headers)
 
-    return {**res.json(), "ok": res.ok}
+        return {**res.json(), "ok": res.ok}
+    except Exception as e:
+        error_handler(e)
+        return None
 
 
 def change_movie_status_by_id(movie_id: str):
-    headers = {
-        'Authorization': f'Bearer {get_access_token()}'
-    }
+    try:
+        headers = {
+            'Authorization': f'Bearer {get_access_token()}'
+        }
 
-    res = req.put(f'{getenv("BASE_URL")}/movie/status/{movie_id}', headers=headers)
+        res = req.put(f'{getenv("BASE_URL")}/movie/status/{movie_id}', headers=headers)
 
-    return {**res.json(), "ok": res.ok}
+        return {**res.json(), "ok": res.ok}
+    except Exception as e:
+        error_handler(e)
+        return None
 
 
 def search_in_movies(q: str):
-    res = req.get(f'{getenv("BASE_URL")}/movie/search?q={q}')
+    try:
+        res = req.get(f'{getenv("BASE_URL")}/movie/search?q={q}')
 
-    return res.json()
+        return res.json()
+    except Exception as e:
+        error_handler(e)
+        return None
 
 
 def get_favorite_movies():
@@ -108,6 +142,7 @@ def get_favorite_movies():
     except Exception as e:
         error_handler(e)
         return None
+
 
 def add_favorite_movie(movie_id: str):
     try:
