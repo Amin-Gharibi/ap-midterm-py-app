@@ -32,7 +32,8 @@ class ItemBox(tk.Frame):
         summary_label.grid(row=3, column=0, padx=15, sticky='w')
 
         # Rate label
-        rate_label = ctk.CTkLabel(self, text=f"{self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0)} {'⭐' * int(self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0))}",
+        rate_label = ctk.CTkLabel(self,
+                                  text=f"{self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0) if not 'rate' in self.item else self.item['rate']} {'⭐' * int(self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0) if not 'rate' in self.item.keys() else self.item['rate'])}",
                                   fg_color=target_fg_color[1], font=("Arial", 12, 'italic'), text_color='yellow')
         rate_label.grid(row=4, column=0, padx=10, sticky="w")
 
@@ -56,13 +57,18 @@ class ItemBox(tk.Frame):
 
     def get_item_type_and_cover_key(self):
         """Determine the item type and corresponding cover key."""
-        if 'movie' in self.item:
+        if 'cover' in self.item and 'title' in self.item:
+            return 'articlesCovers', self.item['cover']
+        elif 'cover' in self.item:
+            return 'moviesPictures', self.item['cover']
+        elif 'profilePic':
+            return 'usersProfilePictures', self.item['profilePic']
+        elif 'movie' in self.item:
             return 'moviesPictures', self.item['movie']['cover']
         elif 'article' in self.item:
             return 'articlesCovers', self.item['article']['cover']
         elif 'cast' in self.item:
             return 'usersProfilePictures', self.item['cast']['profilePic']
-        return None, None
 
     def get_title_text(self):
         """Extract the title text based on the item type."""
@@ -70,9 +76,9 @@ class ItemBox(tk.Frame):
             return self.item['movie']['fullName']
         elif 'article' in self.item:
             return self.item['article']['title']
-        elif 'cast' in self.item:
+        elif 'cast' in self.item and 'cover' not in self.item:
             return self.item['cast']['fullName']
-        return ''
+        return self.item.get('fullName', self.item.get('title', ''))
 
     def get_summary_text(self):
         """Extract the summary or body text and its height."""
@@ -80,9 +86,9 @@ class ItemBox(tk.Frame):
             return self.item['movie']['summary'], 80
         elif 'article' in self.item and self.item['article']['body']:
             return self.item['article']['body'], 80
-        elif 'biography' in self.item and self.item['cast']['biography']:
+        elif 'cast' in self.item and 'cover' not in self.item and self.item['cast']['biography']:
             return self.item['cast']['biography'], 80
-        return '', 0
+        return self.item.get('summary', self.item.get('body', self.item.get('biography', ''))), 80
 
     def on_details_click_handler(self):
         """Handle the details button click by navigating to the details page."""

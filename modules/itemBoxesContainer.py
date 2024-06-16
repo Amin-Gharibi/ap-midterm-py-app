@@ -26,3 +26,7 @@ class ItemBoxesContainer(ctk.CTkFrame):
                      details_page=details_page,
                      item=item[1])
              .grid(row=floor(item[0] / 4) + 1, column=(item[0] % 4), padx=(50, 0), pady=(50, 0)))
+
+        if not len(items):
+            self.grid_columnconfigure((0, 1), weight=1)
+            ctk.CTkLabel(self, text='Nothing Found...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1, column=0, columnspan=2)

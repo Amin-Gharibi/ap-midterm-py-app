@@ -170,3 +170,20 @@ def delete_favorite_movie(movie_id: str):
     except Exception as e:
         error_handler(e)
         return None
+
+
+def get_latest_movies():
+    try:
+        res = req.get(f"{getenv('BASE_URL')}/movie/latest")
+
+        return res.json()
+    except Exception as e:
+        return error_handler(e)
+
+
+def get_random_genre_top_rated():
+    try:
+        res = req.get(f"{getenv('BASE_URL')}/movie/randomgenretoprated")
+        return res.json()
+    except Exception as e:
+        return error_handler(e)

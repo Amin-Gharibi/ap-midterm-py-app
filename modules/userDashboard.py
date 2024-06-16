@@ -424,7 +424,11 @@ class UserDashboard(ctk.CTkFrame):
                           icon='check')
             self.update_my_articles_table()
         else:
-            CTkMessagebox(title='Error', message=f"Error in {isPublished and 'Creating' or 'Drafting'} The Article!",
+            message = ""
+            for error in create_result['message']:
+                message += error['message'] + ', '
+            message = message[:-2]
+            CTkMessagebox(title='Error', message=message,
                           icon='cancel')
 
     def update_my_articles_table(self):

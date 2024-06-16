@@ -178,3 +178,12 @@ def delete_favorite_article(article_id: str):
         return res.json()
     except Exception as e:
         error_handler(e)
+
+
+def get_latest_articles():
+    try:
+        res = req.get(f"{getenv('BASE_URL')}/article/latest")
+
+        return res.json()
+    except Exception as e:
+        return error_handler(e)

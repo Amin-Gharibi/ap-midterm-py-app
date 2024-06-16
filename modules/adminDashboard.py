@@ -423,7 +423,7 @@ class AdminDashboard(ctk.CTkFrame):
                                            input_placeholder="Enter Movie Name...")
         self.movie_name_entry.grid(row=1, column=0)
 
-        self.movie_genre_entry = PlainInput(add_new_movie_frame, label_text='Movie Genre:',
+        self.movie_genre_entry = PlainInput(add_new_movie_frame, label_text='Movie Genres(separated by space):',
                                             input_placeholder="Enter Movie Genres...")
         self.movie_genre_entry.grid(row=1, column=1)
 
@@ -1066,9 +1066,6 @@ class AdminDashboard(ctk.CTkFrame):
         # empty widgets in the parent
         for widget in parent.winfo_children():
             widget.destroy()
-
-        for cm in self.all_comments:
-            print(cm['page'])
 
         all_waiting_comments = [
             ['ID', 'User', 'Page', 'Rate', 'Body', 'Approve', 'Reject'],

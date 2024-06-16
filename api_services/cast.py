@@ -65,3 +65,12 @@ def search_cast(q: str):
         return {**res.json(), "ok": res.ok}
     except Exception as e:
         return error_handler(e)
+
+
+def get_top_rated_cast():
+    try:
+        res = req.get(f"{getenv('BASE_URL')}/cast/toprated")
+
+        return res.json()
+    except Exception as e:
+        return error_handler(e)
