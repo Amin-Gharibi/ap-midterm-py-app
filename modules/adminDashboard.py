@@ -1068,7 +1068,7 @@ class AdminDashboard(ctk.CTkFrame):
             widget.destroy()
 
         all_waiting_comments = [
-            ['ID', 'User', 'Page', 'Rate', 'Body', 'Approve', 'Reject'],
+            ['ID', 'User', 'Page', 'Rate', 'Body', 'Approve', 'Delete'],
             *[
                 [
                     '...' + comment['_id'][-6:],
@@ -1077,7 +1077,7 @@ class AdminDashboard(ctk.CTkFrame):
                     comment['rate'],
                     'See',
                     'Approve',
-                    'Reject'
+                    'Delete'
                 ] for comment in self.all_comments
             ]
         ]
@@ -1090,6 +1090,7 @@ class AdminDashboard(ctk.CTkFrame):
         if len(all_waiting_comments) > 1:
             self.all_comments_table = CTkTable(self.all_waiting_comments_frame, values=all_waiting_comments, hover=True,
                                                column_hover=[4, 5, 6],
+                                               command=self.handle_comments_funcs,
                                                column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
                                                column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'],
                                                not_hover_rows=[0])
@@ -1101,6 +1102,30 @@ class AdminDashboard(ctk.CTkFrame):
                                                         text_color='gray')
             self.comment_not_found_label.pack()
 
+    def handle_comments_funcs(self, *args):
+        row = args[0]['row']
+        column = args[0]['column']
+        if row > 0:
+            if column == 4:
+                # show comment body
+                pass
+            if column == 5:
+                from api_services.comment import approve_comment
+                approve_result = approve_comment(self.all_comments[row - 1]['_id'])
+                if approve_result['ok']:
+                    CTkMessagebox(title='Success', message='Comment Approved Successfully!', icon='check')
+                    self.update_wait_list_comments_table()
+                else:
+                    CTkMessagebox(title='Error', message=approve_result['message'], icon='cancel')
+            if column == 6:
+                from api_services.comment import delete_comment
+                reject_result = delete_comment(self.all_comments[row-1]['_id'])
+                if reject_result['ok']:
+                    CTkMessagebox(title='Success', message='Comment Rejected And Deleted Successfully!', icon='check')
+                    self.update_wait_list_comments_table()
+                else:
+                    CTkMessagebox(title='Error', message=reject_result['message'], icon='cancel')
+
     def update_wait_list_comments_table(self):
         from api_services.comment import get_wait_list_comments
 
@@ -1109,7 +1134,7 @@ class AdminDashboard(ctk.CTkFrame):
             self.all_comments = self.all_comments['waitListComments']
 
         all_waiting_comments = [
-            ['ID', 'User', 'Page', 'Rate', 'Body', 'Approve', 'Reject'],
+            ['ID', 'User', 'Page', 'Rate', 'Body', 'Approve', 'Delete'],
             *[
                 [
                     '...' + comment['_id'][-6:],
@@ -1118,7 +1143,7 @@ class AdminDashboard(ctk.CTkFrame):
                     comment['rate'],
                     'See',
                     'Approve',
-                    'Reject'
+                    'Delete'
                 ] for comment in self.all_comments
             ]
         ]

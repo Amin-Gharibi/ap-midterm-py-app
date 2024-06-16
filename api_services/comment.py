@@ -58,6 +58,7 @@ def get_comment_by_id(comment_id: str):
 def create_comment(body: str,
                    page: str,
                    pageModel: str,
+                   rate: int = 0,
                    parentComment: str = None):
     try:
 
@@ -69,7 +70,7 @@ def create_comment(body: str,
 
         res = req.post(f"{getenv('BASE_URL')}/comment", json=sending_data, headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None
@@ -83,7 +84,7 @@ def delete_comment(comment_id: str):
 
         res = req.delete(f"{getenv('BASE_URL')}/comment/{comment_id}", headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.json()}
     except Exception as e:
         error_handler(e)
         return None
@@ -97,21 +98,7 @@ def approve_comment(comment_id: str):
 
         res = req.put(f"{getenv('BASE_URL')}/comment/approve/{comment_id}", headers=headers)
 
-        return res.json()
-    except Exception as e:
-        error_handler(e)
-        return None
-
-
-def reject_comment(comment_id: str):
-    try:
-        headers = {
-            "Authorization": f"Bearer {get_access_token()}"
-        }
-
-        res = req.put(f"{getenv('BASE_URL')}/comment/reject/{comment_id}", headers=headers)
-
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None

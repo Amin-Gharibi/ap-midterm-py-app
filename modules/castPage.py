@@ -3,7 +3,6 @@ import customtkinter as ctk
 from modules.headerNavBar import HeaderNavBar
 from modules.imageSlider import ImageSlider
 from modules.sectionTitle import SectionTitle
-from utils.util import format_description
 from modules.itemBoxesContainer import ItemBoxesContainer
 from modules.commentsSection import CommentsSection
 

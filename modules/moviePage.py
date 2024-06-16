@@ -6,13 +6,14 @@ from modules.itemBoxesContainer import ItemBoxesContainer
 from modules.castPage import CastPage
 from modules.sectionTitle import SectionTitle
 from modules.commentsSection import CommentsSection
+from api_services.movies import get_movie_by_id
 
 
 class MoviePage(ctk.CTkScrollableFrame):
-    def __init__(self, master, movie, *args, **kwargs):
+    def __init__(self, master, movie_id, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        self.movie = movie
+        self.movie = get_movie_by_id(movie_id)['targetMovie']
 
         self.configure(fg_color='transparent')
         self.grid_columnconfigure(0, weight=1)
@@ -23,11 +24,11 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # page title
         # add space after movie title because the font is italic
-        page_title = ctk.CTkLabel(self, text=self.movie['title'] + ' ', font=('Arial', 36, 'italic'))
+        page_title = ctk.CTkLabel(self, text=self.movie['fullName'] + ' ', font=('Arial', 36, 'italic'))
         page_title.grid(row=1, column=0, sticky="ew", pady=(50, 30))
 
         # image slider
-        image_slider = ImageSlider(self, ['images/imdb_logo.png'])
+        image_slider = ImageSlider(self, self.movie['medias'], 'moviesPictures')
         image_slider.grid(row=2, column=0)
 
         movie_details_title = SectionTitle(self, 'Movie Details')
@@ -45,7 +46,7 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # summary body label
         summary_label = ctk.CTkLabel(movie_details_frame,
-                                     text=self.movie['description'],
+                                     text=self.movie['summary'],
                                      justify='left', anchor='w')
         summary_label.grid(row=1, column=0, sticky="ew", pady=(5, 0))
 
@@ -59,7 +60,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         genre_title_label.grid(row=2, column=0, sticky='w')
 
         # genre body
-        genre_label = ctk.CTkLabel(genre_frame, text=self.movie['genre'], justify='left', anchor='w')
+        genre_label = ctk.CTkLabel(genre_frame, text=', '.join(self.movie['genre']), justify='left', anchor='w')
         genre_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # release date temp frame
@@ -102,7 +103,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         language_title_label.grid(row=2, column=0, sticky='w')
 
         # language body
-        language_label = ctk.CTkLabel(language_frame, text=self.movie['languages'], justify='left',
+        language_label = ctk.CTkLabel(language_frame, text=self.movie['language'], justify='left',
                                       anchor='w')
         language_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
@@ -135,101 +136,15 @@ class MoviePage(ctk.CTkScrollableFrame):
                                   anchor='w', text_color='yellow')
         rate_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
-        artists_details = [
-            {
-                "id": 0,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
-            },
-            {
-                "id": 1,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
-            },
-            {
-                "id": 2,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
-            },
-            {
-                "id": 3,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
-            },
-            {
-                "id": 2,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
-            },
-            {
-                "id": 3,
-                "cover": "images/imdb_logo.png",
-                "title": "MohamadAmin Gharibi",
-                "description": "",
-                "rate": 4.5
-            }
-        ]
-
         # cast section
-        cast_container = ItemBoxesContainer(master=self, target_fg_color=header.get_fg_color(),
+        cast_container = ItemBoxesContainer(master=self, target_fg_color=['gray86', 'gray17'],
                                             title='Cast',
                                             container_bg_color=rate_frame.cget('bg_color'),
-                                            items=artists_details,
+                                            items=self.movie['cast'],
                                             details_page=CastPage)
         cast_container.grid(row=5, column=0, sticky='ew')
         cast_container.section_title.grid(pady=0)
 
-        comments = [
-            {
-                'user': {
-                    'name': 'MohamadAmin Gharibi',
-                    'profile_pic': "images/imdb_logo.png",
-                    'role': 'User'
-                },
-                'body': 'hello world this is test first comment',
-                'rate': 7.5,
-                'responds': [
-                    {
-                        'user': {
-                            'name': 'MohamadAmin Gharibi',
-                            'profile_pic': "images/imdb_logo.png",
-                            'role': 'User'
-                        },
-                        'body': "hello world this is reply first test comment. isn't the UI beautiful? :)"
-                    }
-                ]
-            },
-            {
-                'user': {
-                    'name': 'RFE',
-                    'profile_pic': "images/imdb_logo.png",
-                    'role': 'User'
-                },
-                'body': 'hello world i am gay and this movie is the best of the best',
-                'rate': 1,
-                'responds': [
-                    {
-                        'user': {
-                            'name': 'MohamadAmin Gharibi',
-                            'profile_pic': "images/imdb_logo.png",
-                            'role': 'User'
-                        },
-                        'body': "koskholo nega 😂"
-                    }
-                ]
-            }
-        ]
-
         # comments section
-        comments_container = CommentsSection(self, comments)
+        comments_container = CommentsSection(self, self.movie['comments'], page_id=self.movie['_id'], page_type='Movies')
         comments_container.grid(row=6, column=0, sticky='ew')

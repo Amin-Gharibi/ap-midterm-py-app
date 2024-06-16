@@ -2,7 +2,6 @@ import customtkinter as ctk
 from modules.headerNavBar import HeaderNavBar
 from modules.itemBoxesContainer import ItemBoxesContainer
 from modules.searchBox import SearchBox
-from utils.util import format_description
 from modules.moviePage import MoviePage
 from modules.castPage import CastPage
 from modules.articlePage import ArticlePage

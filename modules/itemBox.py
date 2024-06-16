@@ -22,7 +22,9 @@ class ItemBox(tk.Frame):
 
         # Title label
         title_text = self.get_title_text()
-        title_label = ctk.CTkLabel(self, text=title_text, fg_color=target_fg_color[1], font=("Arial", 14))
+        if 'inMovieRole' in self.item:
+            title_text += f'\nAs: {self.item['inMovieRole']}\nAlias: {self.item['inMovieName']}'
+        title_label = ctk.CTkLabel(self, text=title_text, fg_color=target_fg_color[1], font=("Arial", 14), anchor='w', justify='left')
         title_label.grid(row=2, column=0, padx=10, sticky="w")
 
         # Summary label
@@ -33,7 +35,7 @@ class ItemBox(tk.Frame):
 
         # Rate label
         rate_label = ctk.CTkLabel(self,
-                                  text=f"{self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0) if not 'rate' in self.item else self.item['rate']} {'⭐' * int(self.item.get('movie', self.item.get('article', 'cast')).get('rate', 0) if not 'rate' in self.item.keys() else self.item['rate'])}",
+                                  text=f"{self.item.get('movie', self.item.get('article', self.item['cast'])).get('rate', 0) if not 'rate' in self.item else self.item['rate']} {'⭐' * int(self.item.get('movie', self.item.get('article', self.item['cast'])).get('rate', 0) if not 'rate' in self.item.keys() else self.item['rate'])}",
                                   fg_color=target_fg_color[1], font=("Arial", 12, 'italic'), text_color='yellow')
         rate_label.grid(row=4, column=0, padx=10, sticky="w")
 
@@ -61,7 +63,7 @@ class ItemBox(tk.Frame):
             return 'articlesCovers', self.item['cover']
         elif 'cover' in self.item:
             return 'moviesPictures', self.item['cover']
-        elif 'profilePic':
+        elif 'profilePic' in self.item:
             return 'usersProfilePictures', self.item['profilePic']
         elif 'movie' in self.item:
             return 'moviesPictures', self.item['movie']['cover']
@@ -95,5 +97,5 @@ class ItemBox(tk.Frame):
         for widget in self.master.master.master.winfo_children():
             widget.destroy()
 
-        dt_page = self.details_page(self.master.master.master, self.item)
+        dt_page = self.details_page(self.master.master.master, self.item['_id'])
         dt_page.grid(row=0, column=0, sticky='nsew')

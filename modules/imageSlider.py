@@ -1,12 +1,18 @@
 import customtkinter as ctk
 from PIL import Image, ImageTk, ImageEnhance
+from os import getenv
+from urllib.parse import urlparse
+import requests
+from io import BytesIO
 
 
 class ImageSlider(ctk.CTkFrame):
-    def __init__(self, master, images_addresses: list, *args, **kwargs):
+    def __init__(self, master, images_addresses: list, image_folder: str, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.configure(fg_color=master.cget('fg_color'))
+
+        self.images_folder = image_folder
 
         self.images = [self.load_and_resize_image(image, (1000, 500)) for image in images_addresses]
         self.small_images = [self.load_and_resize_image(image, (100, 50), opacity=0.5) for image in images_addresses]
@@ -38,7 +44,11 @@ class ImageSlider(ctk.CTkFrame):
             self.thumbnail_labels.append(lbl)
 
     def load_and_resize_image(self, image_path, size, opacity=1.0):
-        image = Image.open(image_path).resize(size)
+        parsed_url = urlparse(getenv('BASE_URL'))
+        item_type, cover_key = self.images_folder, image_path
+        image_url = f"{parsed_url.scheme}://{parsed_url.netloc}/{item_type}/{cover_key}"
+        res = requests.get(image_url)
+        image = Image.open(BytesIO(res.content)).resize(size)
         if opacity < 1.0:
             image = self.adjust_opacity(image, opacity)
         return image
