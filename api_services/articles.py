@@ -11,7 +11,7 @@ def get_all_articles():
 
         res = req.get(f"{getenv('BASE_URL')}/article", headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None
@@ -127,7 +127,11 @@ def change_article_status(article_id: str):
 
 def search_in_articles(q: str = ""):
     try:
-        res = req.get(f"{getenv('BASE_URL')}/article/search?q={q}")
+        headers = {
+            "Authorization": f"Bearer {get_access_token()}"
+        }
+
+        res = req.get(f"{getenv('BASE_URL')}/article/search?q={q}", headers=headers)
 
         return res.json()
     except Exception as e:

@@ -494,7 +494,9 @@ class AdminDashboard(ctk.CTkFrame):
         cast_result_frame = ctk.CTkFrame(movie_cast_frame, width=200, height=200)
         cast_result_frame.grid(row=1, column=1, sticky='nsew')
         cast_result_frame.grid_columnconfigure(0, weight=1)
-        self.cast_result_box = ctk.CTkFrame(cast_result_frame, fg_color='transparent', width=cast_result_frame.cget('width'), height=cast_result_frame.cget('height'))
+        self.cast_result_box = ctk.CTkFrame(cast_result_frame, fg_color='transparent',
+                                            width=cast_result_frame.cget('width'),
+                                            height=cast_result_frame.cget('height'))
         self.cast_result_box.grid_columnconfigure(0, weight=1)
         self.cast_result_box.grid_rowconfigure(0, weight=1)
         self.cast_result_box.grid(row=0, column=0, sticky='nsew')
@@ -600,8 +602,11 @@ class AdminDashboard(ctk.CTkFrame):
         column = args[0]['column']
         if row > 0:
             if column == 1:
-                self.movie_casts.append({"castId": self.cast_search_result['result'][row-1]['_id'], "inMovieName": self.search_cast_name_entry.input.get().split(' - ')[1], "inMovieRole": self.search_cast_name_entry.input.get().split(' - ')[2]})
-                self.movie_casts_temp.append([self.cast_search_result['result'][row-1]['fullName'], self.search_cast_name_entry.input.get().split(' - ')[1]])
+                self.movie_casts.append({"castId": self.cast_search_result['result'][row - 1]['_id'],
+                                         "inMovieName": self.search_cast_name_entry.input.get().split(' - ')[1],
+                                         "inMovieRole": self.search_cast_name_entry.input.get().split(' - ')[2]})
+                self.movie_casts_temp.append([self.cast_search_result['result'][row - 1]['fullName'],
+                                              self.search_cast_name_entry.input.get().split(' - ')[1]])
                 self.update_movie_selected_cast_box()
 
     def update_movie_selected_cast_box(self):
@@ -916,6 +921,11 @@ class AdminDashboard(ctk.CTkFrame):
 
     def load_articles_tab(self, parent):
         from modules.plainInput import PlainInput
+        from api_services.articles import get_all_articles
+
+        self.all_articles = get_all_articles()
+        if self.all_articles['ok']:
+            self.all_articles = self.all_articles['allArticles']
 
         # disable target tab button and enable other tabs button
         self.articles_button.configure(state='disabled')
@@ -932,69 +942,112 @@ class AdminDashboard(ctk.CTkFrame):
         for widget in parent.winfo_children():
             widget.destroy()
 
-        add_new_article_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        add_new_article_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        add_new_article_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
-
-        SectionTitle(add_new_article_frame, text='Add New Article').grid(row=0, column=0, sticky='w', padx=30,
-                                                                         pady=(0, 20))
-
-        title_input = PlainInput(add_new_article_frame, label_text='Article Title:',
-                                 input_placeholder="Enter Article Title...")
-        title_input.grid(row=1, column=0, sticky='w', padx=45)
-
-        article_body_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
-        article_body_frame.grid_columnconfigure(0, weight=1)
-        article_body_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=45, pady=10)
-        ctk.CTkLabel(article_body_frame, text='Article Body:', text_color='gray',
-                     font=("Arial", 12, 'italic')).grid(
-            row=0, column=0, sticky='w')
-        article_body_input = ctk.CTkTextbox(article_body_frame)
-        article_body_input.grid(row=1, column=0, sticky='ew')
-
-        article_cover = None
-        article_cover_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
-        article_cover_frame.grid(row=3, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
-        ctk.CTkLabel(article_cover_frame, text='Article Cover:', text_color='gray',
-                     font=("Arial", 12, "italic")).grid(
-            row=0, column=0, sticky='w')
-        ctk.CTkButton(article_cover_frame, text='Add Cover', command=self.select_file).grid(row=1, column=0,
-                                                                                            sticky='w')
-        selected_cover_count_label = ctk.CTkLabel(article_cover_frame,
-                                                  text=article_cover and 'Article Cover Has Been Selected!' or 'Please Select Article Cover')
-        selected_cover_count_label.grid(row=0, column=1, padx=20)
-
-        submit_form_buttons_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
-        submit_form_buttons_frame.grid(row=4, column=0, columnspan=3, pady=40)
-        ctk.CTkButton(submit_form_buttons_frame, text='Create').grid(row=0, column=0)
-        ctk.CTkButton(submit_form_buttons_frame, text='Save As Draft', fg_color='#EF5350',
-                      hover_color='#C62828').grid(
-            row=0, column=1, padx=30)
-
         all_articles_list = [
-            ['Title', 'Rate', 'Status', 'Details', 'Edit', 'Delete'],
-            ['After Jendegi', '4.3', 'Published', 'Details', 'Edit', 'Delete'],
-            ['After Life', '4.1', 'Published', 'Details', 'Edit', 'Delete'],
-            ['After Zendegi', '0.0', 'Draft', 'Details', 'Edit', 'Delete']
+            ['ID', 'Title', 'Rate', 'Status', 'Details', 'Delete'],
+            *[
+                [
+                    '...' + article['_id'][-6:],
+                    article['title'],
+                    article['rate'],
+                    'Published' if article['isPublished'] else 'Not Published',
+                    'Details',
+                    'Delete'
+                ] for article in self.all_articles
+            ]
         ]
 
-        all_articles_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        all_articles_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
-        temp_frame = ctk.CTkFrame(all_articles_frame, fg_color='transparent')
+        self.all_articles_table = None
+        self.article_not_found_label = None
+        self.all_articles_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        self.all_articles_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
+        temp_frame = ctk.CTkFrame(self.all_articles_frame, fg_color='transparent')
         temp_frame.pack(expand=True, fill='x')
         SectionTitle(temp_frame, text='All Articles').pack(padx=30, side=tkinter.LEFT)
         search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
         search_box_frame.pack(padx=30, side=tkinter.RIGHT)
-        search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
-        search_box_entry.grid(row=0, column=0, padx=10)
-        ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
-        all_articles_table = CTkTable(all_articles_frame, values=all_articles_list, hover=True,
-                                      column_hover=[3, 4, 5],
-                                      column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
-                                      column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
-        all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        self.search_in_articles_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
+        self.search_in_articles_entry.grid(row=0, column=0, padx=10)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60, command=self.handle_searching_in_articles).grid(row=0,
+                                                                                                              column=1)
+        if len(all_articles_list) > 1:
+            self.all_articles_table = CTkTable(self.all_articles_frame, values=all_articles_list, hover=True,
+                                               column_hover=[4, 5],
+                                               command=self.handle_articles_funcs,
+                                               column_hover_text_color=['#F57C00', '#F57C00'],
+                                               column_hover_bg_color=['#1B5E20', '#B71C1C'],
+                                               not_hover_rows=[0])
+            self.all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        else:
+            self.article_not_found_label = ctk.CTkLabel(self.all_articles_frame,
+                                                        text='No Articles Yet...',
+                                                        font=('Arial', 16, 'italic'),
+                                                        text_color='gray')
+            self.article_not_found_label.pack()
+
+    def handle_searching_in_articles(self):
+        from api_services.articles import search_in_articles
+        search_result = search_in_articles(q=self.search_in_articles_entry.get())
+        self.update_all_articles_table(search_result=search_result['result'])
+
+    def handle_articles_funcs(self, *args):
+        row = args[0]['row']
+        column = args[0]['column']
+        if row > 0:
+            if column == 4:
+                # handle showing details
+                pass
+            if column == 5:
+                from api_services.articles import delete_article
+                delete_result = delete_article(self.all_articles[row - 1]['_id'])
+                if delete_result['ok']:
+                    CTkMessagebox(title='Success', message='Article Deleted Successfully!', icon='check')
+                    self.update_all_articles_table()
+                else:
+                    CTkMessagebox(title='Error', message=delete_result['message'], icon='cancel')
+
+    def update_all_articles_table(self, search_result=None):
+        from api_services.articles import get_all_articles
+
+        self.all_articles = search_result if search_result else get_all_articles()
+        if not search_result and self.all_articles['ok']:
+            self.all_articles = self.all_articles['allArticles']
+
+        all_articles_list = [
+            ['ID', 'Title', 'Rate', 'Status', 'Details', 'Delete'],
+            *[
+                [
+                    '...' + article['_id'][-6:],
+                    article['title'],
+                    article['rate'],
+                    'Published' if article['isPublished'] else 'Not Published',
+                    'Details',
+                    'Delete'
+                ] for article in self.all_articles
+            ]
+        ]
+
+        if self.all_articles_table:
+            self.all_articles_table.destroy()
+        if self.article_not_found_label:
+            self.article_not_found_label.destroy()
+
+        if len(all_articles_list) > 1:
+            self.all_articles_table = CTkTable(self.all_articles_frame, values=all_articles_list, hover=True,
+                                               column_hover=[4, 5],
+                                               command=self.handle_articles_funcs,
+                                               column_hover_text_color=['#F57C00', '#F57C00'],
+                                               column_hover_bg_color=['#1B5E20', '#B71C1C'],
+                                               not_hover_rows=[0])
+            self.all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        else:
+            self.article_not_found_label = ctk.CTkLabel(self.all_casts_frame,
+                                                        text='No Articles Yet...',
+                                                        font=('Arial', 16, 'italic'),
+                                                        text_color='gray')
+            self.article_not_found_label.pack()
 
     def load_comments_tab(self, parent):
+        from api_services.comment import get_wait_list_comments
         # disable target tab button and enable other tabs button
         self.comments_button.configure(state='disabled')
         self.my_profile_button.configure(state='normal')
@@ -1006,22 +1059,88 @@ class AdminDashboard(ctk.CTkFrame):
         self.movies_button.configure(state='normal')
         self.casts_button.configure(state='normal')
 
+        self.all_comments = get_wait_list_comments()
+        if self.all_comments['ok']:
+            self.all_comments = self.all_comments['waitListComments']
+
         # empty widgets in the parent
         for widget in parent.winfo_children():
             widget.destroy()
 
+        for cm in self.all_comments:
+            print(cm['page'])
+
         all_waiting_comments = [
-            ['User', 'Page', 'Rate', 'Status', 'Body', 'Approve', 'Reject'],
-            ['MohamadAmin Gharibi', 'After Life', '4.5', 'Approved', 'See', 'Approve', 'Reject'],
-            ['Amin Gharibi', 'After Jendegi', '1.2', 'Rejected', 'See', 'Approve', 'Reject'],
-            ['Amir Testi', 'After Zendegi', '3.4', '--', 'See', 'Approve', 'Reject']
+            ['ID', 'User', 'Page', 'Rate', 'Body', 'Approve', 'Reject'],
+            *[
+                [
+                    '...' + comment['_id'][-6:],
+                    comment['user']['username'],
+                    comment['page'].get('title', comment['page'].get('fullName')),
+                    comment['rate'],
+                    'See',
+                    'Approve',
+                    'Reject'
+                ] for comment in self.all_comments
+            ]
         ]
 
-        all_waiting_comments_frame = ctk.CTkFrame(parent, fg_color='transparent')
-        all_waiting_comments_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
-        SectionTitle(all_waiting_comments_frame, text='Comments Waiting List').pack(padx=30, anchor='w')
-        all_articles_table = CTkTable(all_waiting_comments_frame, values=all_waiting_comments, hover=True,
-                                      column_hover=[4, 5, 6],
-                                      column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
-                                      column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'], not_hover_rows=[0])
-        all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        self.all_waiting_comments_frame = ctk.CTkFrame(parent, fg_color='transparent')
+        self.all_waiting_comments_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
+        SectionTitle(self.all_waiting_comments_frame, text='Comments Waiting List').pack(padx=30, anchor='w')
+        self.all_comments_table = None
+        self.comment_not_found_label = None
+        if len(all_waiting_comments) > 1:
+            self.all_comments_table = CTkTable(self.all_waiting_comments_frame, values=all_waiting_comments, hover=True,
+                                               column_hover=[4, 5, 6],
+                                               column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                               column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'],
+                                               not_hover_rows=[0])
+            self.all_comments_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        else:
+            self.comment_not_found_label = ctk.CTkLabel(self.all_waiting_comments_frame,
+                                                        text='No Comments In Waiting List...',
+                                                        font=('Arial', 16, 'italic'),
+                                                        text_color='gray')
+            self.comment_not_found_label.pack()
+
+    def update_wait_list_comments_table(self):
+        from api_services.comment import get_wait_list_comments
+
+        self.all_comments = get_wait_list_comments()
+        if self.all_comments['ok']:
+            self.all_comments = self.all_comments['waitListComments']
+
+        all_waiting_comments = [
+            ['ID', 'User', 'Page', 'Rate', 'Body', 'Approve', 'Reject'],
+            *[
+                [
+                    '...' + comment['_id'][-6:],
+                    comment['user']['username'],
+                    comment['page'].get('fullName', 'title'),
+                    comment['rate'],
+                    'See',
+                    'Approve',
+                    'Reject'
+                ] for comment in self.all_comments
+            ]
+        ]
+
+        if self.all_comments_table:
+            self.all_comments_table.destroy()
+        if self.comment_not_found_label:
+            self.comment_not_found_label.destroy()
+
+        if len(all_waiting_comments) > 1:
+            self.all_comments_table = CTkTable(self.all_waiting_comments_frame, values=all_waiting_comments, hover=True,
+                                               column_hover=[4, 5, 6],
+                                               column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
+                                               column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'],
+                                               not_hover_rows=[0])
+            self.all_comments_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
+        else:
+            self.comment_not_found_label = ctk.CTkLabel(self.all_waiting_comments_frame,
+                                                        text='No Comments In Waiting List...',
+                                                        font=('Arial', 16, 'italic'),
+                                                        text_color='gray')
+            self.comment_not_found_label.pack()

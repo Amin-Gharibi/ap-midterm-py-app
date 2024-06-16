@@ -11,7 +11,7 @@ def get_wait_list_comments():
 
         res = req.get(f"{getenv('BASE_URL')}/comment", headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None
