@@ -226,7 +226,7 @@ class UserDashboard(ctk.CTkFrame):
 
         # create each comments template from the backend
         for index, comment in enumerate(my_comments):
-            Comment(parent, comment, fg_color='gray23', has_reply_btn=False).grid(row=index + 1, column=0, columnspan=2,
+            Comment(parent, comment, fg_color='gray23', has_reply_btn=False, has_like_label=True, has_delete_btn=True).grid(row=index + 1, column=0, columnspan=2,
                                                                                   sticky='ew',
                                                                                   padx=40, pady=20)
 

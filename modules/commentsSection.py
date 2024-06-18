@@ -40,7 +40,7 @@ class CommentsSection(ctk.CTkFrame):
 
         # create each comments template from the backend
         for index, comment in enumerate(comments):
-            Comment(comments_container, comment, fg_color='gray23').grid(row=index, column=0, sticky='ew', padx=20, pady=20)
+            Comment(comments_container, comment, fg_color='gray23', has_like_button=True).grid(row=index, column=0, sticky='ew', padx=20, pady=20)
 
         if not len(comments):
             ctk.CTkLabel(comments_container, text='No Comments Yet...! Be The First One To Tell Your Opinion :)', height=150).grid(row=0, column=0, sticky='ew')

@@ -112,7 +112,7 @@ def like_comment(comment_id: str):
 
         res = req.put(f"{getenv('BASE_URL')}/comment/like/{comment_id}", headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None
@@ -126,7 +126,7 @@ def dislike_comment(comment_id: str):
 
         res = req.put(f"{getenv('BASE_URL')}/comment/dislike/{comment_id}", headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None
