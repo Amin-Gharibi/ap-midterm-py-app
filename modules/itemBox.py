@@ -64,17 +64,26 @@ class ItemBox(tk.Frame):
     def get_item_type_and_cover_key(self):
         """Determine the item type and corresponding cover key."""
         if 'cover' in self.item and 'title' in self.item:
+            # its article
             return 'articlesCovers', self.item['cover']
         elif 'cover' in self.item:
+            # its movie
             return 'moviesPictures', self.item['cover']
+        elif 'photos' in self.item:
+            # its cast user
+            return 'moviesPictures', self.item['profilePic']
+        elif 'cast' in self.item:
+            # its cast user
+            return 'moviesPictures', self.item['cast']['profilePic']
         elif 'profilePic' in self.item:
+            # its normal user
             return 'usersProfilePictures', self.item['profilePic']
         elif 'movie' in self.item:
+            # its movie
             return 'moviesPictures', self.item['movie']['cover']
         elif 'article' in self.item:
+            # its article
             return 'articlesCovers', self.item['article']['cover']
-        elif 'cast' in self.item:
-            return 'usersProfilePictures', self.item['cast']['profilePic']
 
     def get_title_text(self):
         """Extract the title text based on the item type."""

@@ -24,7 +24,6 @@ class AdminDashboard(ctk.CTkFrame):
             self.destroy()
             LoginForm(self.master).grid(row=0, column=0)
 
-
         self.welcome_label = ctk.CTkButton(self, text=f"Welcome Dear {self.data['user']['fullName']} ",
                                            fg_color='transparent', hover_color=self.cget('fg_color'),
                                            font=("Arial", 20, "italic"), command=user_dashboard.load_main_page)
@@ -462,10 +461,11 @@ class AdminDashboard(ctk.CTkFrame):
         ctk.CTkLabel(movie_cover_frame, text='Movie Cover:', text_color='gray',
                      font=("Arial", 12, "italic")).grid(
             row=0, column=0, sticky='w')
-        ctk.CTkButton(movie_cover_frame, text='Add Cover', command=self.select_file).grid(row=1, column=0,
-                                                                                          sticky='w')
+        ctk.CTkButton(movie_cover_frame, text='Add Cover', command=self.select_movie_cover_handler).grid(row=1,
+                                                                                                         column=0,
+                                                                                                         sticky='w')
         self.movie_selected_cover_label = ctk.CTkLabel(movie_cover_frame,
-                                                       text=self.movie_cover and 'Movie Cover Has Been Selected!' or 'Please Select Movie Cover')
+                                                       text='Please Select Movie Cover')
         self.movie_selected_cover_label.grid(row=0, column=1, padx=20)
 
         self.movie_medias = []
@@ -473,9 +473,11 @@ class AdminDashboard(ctk.CTkFrame):
         movie_medias_frame.grid(row=5, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
         ctk.CTkLabel(movie_medias_frame, text='Movie Medias:', text_color='gray', font=("Arial", 12, "italic")).grid(
             row=0, column=0, sticky='w')
-        ctk.CTkButton(movie_medias_frame, text='Add Media', command=self.select_file).grid(row=1, column=0, sticky='w')
+        ctk.CTkButton(movie_medias_frame, text='Add Media', command=self.select_movie_medias_handler).grid(row=1,
+                                                                                                           column=0,
+                                                                                                           sticky='w')
         self.selected_movie_medias_count_label = ctk.CTkLabel(movie_medias_frame,
-                                                              text=f'{len(self.movie_medias)} Medias Have Been Selected!')
+                                                              text=f'Please Select Movie Medias!')
         self.selected_movie_medias_count_label.grid(row=0, column=1, padx=20)
 
         self.movie_casts = []
@@ -561,6 +563,12 @@ class AdminDashboard(ctk.CTkFrame):
                                                        text_color='gray')
             self.movies_not_found_label.pack()
 
+    def select_movie_cover_handler(self):
+        self.movie_cover = filedialog.askopenfilename()
+
+    def select_movie_medias_handler(self):
+        self.movie_medias = filedialog.askopenfilenames()
+
     def search_cast_handler(self):
         from api_services.cast import search_cast
         self.cast_search_result = search_cast(self.search_cast_name_entry.input.get().split(' - ')[0])
@@ -610,6 +618,7 @@ class AdminDashboard(ctk.CTkFrame):
                 self.movie_casts.append({"castId": self.cast_search_result['result'][row - 1]['_id'],
                                          "inMovieName": self.search_cast_name_entry.input.get().split(' - ')[1],
                                          "inMovieRole": self.search_cast_name_entry.input.get().split(' - ')[2]})
+                # created a temp because the main data doesn't contain the thing that i need to show in the gui
                 self.movie_casts_temp.append([self.cast_search_result['result'][row - 1]['fullName'],
                                               self.search_cast_name_entry.input.get().split(' - ')[1]])
                 self.update_movie_selected_cast_box()
@@ -625,7 +634,7 @@ class AdminDashboard(ctk.CTkFrame):
         from api_services.movies import create_movie
         create_result = create_movie(
             fullName=self.movie_name_entry.input.get(),
-            summary=self.movie_summary_entry.get("1.0"),
+            summary=self.movie_summary_entry.get("1.0", ctk.END),
             genre=self.movie_genre_entry.input.get(),
             releaseDate=self.movie_release_date_entry.input.get(),
             countries=self.movie_countries_entry.input.get(),
@@ -762,28 +771,29 @@ class AdminDashboard(ctk.CTkFrame):
 
         self.cast_birth_place_entry = PlainInput(add_new_cast_frame, label_text='Birth Place:',
                                                  input_placeholder="Enter Birth Place...")
-        self.cast_birth_place_entry.grid(row=4, column=0, sticky='w', padx=45)
+        self.cast_birth_place_entry.grid(row=3, column=1, sticky='w', padx=45)
 
         self.cast_height_entry = PlainInput(add_new_cast_frame, label_text='Name:',
                                             input_placeholder="Enter Cast Height...")
-        self.cast_height_entry.grid(row=5, column=0, sticky='w', padx=45)
+        self.cast_height_entry.grid(row=3, column=2, sticky='w', padx=45)
 
         self.cast_profile_pic = None
         self.cast_page_photos = None
 
         cast_profile_pic_frame = ctk.CTkFrame(add_new_cast_frame, fg_color='transparent')
-        cast_profile_pic_frame.grid(row=6, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
+        cast_profile_pic_frame.grid(row=4, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
         ctk.CTkLabel(cast_profile_pic_frame, text='Cast Profile:', text_color='gray',
                      font=("Arial", 12, "italic")).grid(
             row=0, column=0, sticky='w')
-        ctk.CTkButton(cast_profile_pic_frame, text='Add Profile', command=self.select_file).grid(row=1, column=0,
-                                                                                                 sticky='w')
+        ctk.CTkButton(cast_profile_pic_frame, text='Add Profile', command=self.select_cast_profile_pic).grid(row=1,
+                                                                                                             column=0,
+                                                                                                             sticky='w')
         selected_profile_pic_label = ctk.CTkLabel(cast_profile_pic_frame,
                                                   text=self.cast_profile_pic and 'Cast Profile Has Been Selected!' or 'Please Select Cast Profile')
         selected_profile_pic_label.grid(row=0, column=1, padx=20)
 
         cast_page_photos_frame = ctk.CTkFrame(add_new_cast_frame, fg_color='transparent')
-        cast_page_photos_frame.grid(row=7, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
+        cast_page_photos_frame.grid(row=4, column=1, columnspan=3, sticky="ew", padx=45, pady=20)
         ctk.CTkLabel(cast_page_photos_frame, text='Cast Page Photos:', text_color='gray',
                      font=("Arial", 12, "italic")).grid(
             row=0, column=0, sticky='w')
@@ -794,8 +804,9 @@ class AdminDashboard(ctk.CTkFrame):
                                                 text=self.cast_profile_pic and 'Cast Page Photos Have Been Selected!' or 'Please Select Cast Page Photos')
         selected_page_pics_label.grid(row=0, column=1, padx=20)
 
-        ctk.CTkButton(add_new_cast_frame, text='Create', command=self.handle_creating_cast).grid(row=8, column=0,
-                                                                                                 columnspan=3)
+        ctk.CTkButton(add_new_cast_frame, text='Create', command=self.handle_creating_cast).grid(row=5, column=0,
+                                                                                                 columnspan=3,
+                                                                                                 pady=(20, 0))
 
         all_casts_list = [
             ['ID', 'FullName', 'Bio', 'BirthDate', 'BirthPlace', 'Details', 'Edit', 'Delete'],
@@ -846,9 +857,9 @@ class AdminDashboard(ctk.CTkFrame):
             ['ID', 'FullName', 'Bio', 'BirthDate', 'BirthPlace', 'Details', 'Edit', 'Delete'],
             *[
                 [
-                    '...' + cast[-6:],
+                    '...' + cast['_id'][-6:],
                     cast['fullName'],
-                    cast['biography'],
+                    cast['biography'][:15] + '...',
                     cast['birthDate'],
                     cast['birthPlace'],
                     'Details',
@@ -906,7 +917,7 @@ class AdminDashboard(ctk.CTkFrame):
         from api_services.cast import create_cast
         create_result = create_cast(
             fullName=self.cast_name_entry.input.get(),
-            biography=self.cast_bio_input.get("1.0"),
+            biography=self.cast_bio_input.get("1.0", ctk.END),
             birthDate=self.cast_birth_date_entry.input.get(),
             birthPlace=self.cast_birth_place_entry.input.get(),
             height=self.cast_height_entry.input.get(),
@@ -915,7 +926,7 @@ class AdminDashboard(ctk.CTkFrame):
         )
         if create_result['ok']:
             CTkMessagebox(title='Success', message='Cast Created Successfully!', icon='check')
-            self.update_users_wait_list_table()
+            self.update_all_casts_table()
         else:
             CTkMessagebox(title='Error', message=create_result['message'], icon='cancel')
 
@@ -1124,7 +1135,7 @@ class AdminDashboard(ctk.CTkFrame):
                     CTkMessagebox(title='Error', message=approve_result['message'], icon='cancel')
             if column == 6:
                 from api_services.comment import delete_comment
-                reject_result = delete_comment(self.all_comments[row-1]['_id'])
+                reject_result = delete_comment(self.all_comments[row - 1]['_id'])
                 if reject_result['ok']:
                     CTkMessagebox(title='Success', message='Comment Rejected And Deleted Successfully!', icon='check')
                     self.update_wait_list_comments_table()

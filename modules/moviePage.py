@@ -104,7 +104,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         language_title_label.grid(row=2, column=0, sticky='w')
 
         # language body
-        language_label = ctk.CTkLabel(language_frame, text=self.movie['language'], justify='left',
+        language_label = ctk.CTkLabel(language_frame, text=self.movie['movieLanguage'], justify='left',
                                       anchor='w')
         language_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 

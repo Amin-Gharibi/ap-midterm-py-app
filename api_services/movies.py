@@ -1,6 +1,7 @@
 from os import getenv
 import requests as req
 from utils.util import get_access_token, error_handler
+import json
 
 
 def get_all_approved_movies():
@@ -37,20 +38,44 @@ def create_movie(fullName: str,
                  cast: list,
                  isPublished: bool):
     try:
-        sending_data = {key: value for key, value in locals().items()}
+        data = {
+            "fullName": fullName,
+            "summary": summary,
+            "genre": genre,
+            "releaseDate": releaseDate,
+            "countries": countries,
+            "movieLanguage": language,
+            "budget": budget,
+            "isPublished": isPublished
+        }
+
+        for index, cst in enumerate(cast):
+            data[f"cast[{index}][castId]"] = cst['castId']
+            data[f"cast[{index}][inMovieName]"] = cst['inMovieName']
+            data[f"cast[{index}][inMovieRole]"] = cst['inMovieRole']
 
         headers = {
             "Authorization": f"Bearer {get_access_token()}"
         }
 
-        files = {
-            "cover": open(cover, 'rb'),
-        }
+        # Prepare files for the request
+        with open(cover, 'rb') as profile_pic_file:
+            # Start the list of files with the profile picture
+            files = [
+                ("cover", ("cover.jpg", profile_pic_file, "image/jpeg"))
+            ]
 
-        for index, media in enumerate(medias):
-            files[f"medias[{index}]"] = open(media, 'rb')
+            # Prepare photo files for the request
+            photo_files = [("medias", (f"media{index}.jpg", open(photo, 'rb'), "image/jpeg")) for index, photo in
+                           enumerate(medias)]
 
-        res = req.post(f"{getenv('BASE_URL')}/movie", json=sending_data, files=files, headers=headers)
+            # Add photo files to the list of files
+            files.extend(photo_files)
+
+            res = req.post(f"{getenv('BASE_URL')}/movie", data=data, files=files, headers=headers)
+
+        for _, (_, photo_file, _) in photo_files:
+            photo_file.close()
 
         return {**res.json(), "ok": res.ok}
     except Exception as e:

@@ -13,20 +13,35 @@ def create_cast(fullName: str,
                 photos: tuple,
                 height: str):
     try:
-        sending_data = {key: value for key, value in locals().items()}
+        data = {
+            "fullName": fullName,
+            "biography": biography,
+            "birthDate": birthDate,
+            "birthPlace": birthPlace,
+            "height": height
+        }
 
         headers = {
             "Authorization": f"Bearer {get_access_token()}"
         }
 
-        files = {
-            "profilePic": open(profilePic, 'rb'),
-        }
+        # Prepare files for the request
+        with open(profilePic, 'rb') as profile_pic_file:
+            # Start the list of files with the profile picture
+            files = [
+                ("profilePic", ("profilePic.jpg", profile_pic_file, "image/jpeg"))
+            ]
 
-        for index, photo in enumerate(photos):
-            files[f"photos[{index}]"] = open(photo, 'rb')
+            # Prepare photo files for the request
+            photo_files = [("photos", (f"photo{index}.jpg", open(photo, 'rb'), "image/jpeg")) for index, photo in enumerate(photos)]
 
-        res = req.post(f"{getenv('BASE_URL')}/cast", json=sending_data, files=files, headers=headers)
+            # Add photo files to the list of files
+            files.extend(photo_files)
+
+            res = req.post(f"{getenv('BASE_URL')}/cast", data=data, files=files, headers=headers)
+
+        for _, (_, photo_file, _) in photo_files:
+            photo_file.close()
 
         return {**res.json(), "ok": res.ok}
     except Exception as e:

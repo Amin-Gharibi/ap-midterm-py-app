@@ -13,8 +13,6 @@ class CastPage(ctk.CTkScrollableFrame):
     def __init__(self, master, cast_id, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        print(cast_id)
-
         self.cast = get_one_cast(cast_id)['targetCast']
 
         self.configure(fg_color='transparent')
