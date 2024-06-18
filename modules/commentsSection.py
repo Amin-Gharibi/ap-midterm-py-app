@@ -64,7 +64,8 @@ class CommentsSection(ctk.CTkFrame):
     def abort_replying(self):
         self.rate_entry.grid(row=2, column=0, sticky='w', padx=40, pady=(10, 0))
         self.set_section_title('Comments')
-        self.cancel_replying_button.grid_forget()
+        if self.cancel_replying_button:
+            self.cancel_replying_button.grid_forget()
         self.replying_comment_id = None
         self.comment_text_box.delete("1.0", ctk.END)
 

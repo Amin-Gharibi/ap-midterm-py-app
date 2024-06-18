@@ -78,11 +78,11 @@ class Comment(ctk.CTkFrame):
             data = get_me()
             self.user = data['user'] if data else None
 
-            self.like_button = ctk.CTkButton(options_frame, text=f'Like {len(self.comment['likes'])}',
+            self.like_button = ctk.CTkButton(options_frame, text=f'Likes {len(self.comment['likes'])}',
                                              command=lambda: self.handle_liking(operation='like'),
                                              width=50)
             self.like_button.grid(row=0, column=1, sticky='e', padx=10, pady=(0, 10))
-            self.dislike_button = ctk.CTkButton(options_frame, text=f'DisLike {len(self.comment['disLikes'])}',
+            self.dislike_button = ctk.CTkButton(options_frame, text=f'DisLikes {len(self.comment['disLikes'])}',
                                                 command=lambda: self.handle_liking(operation='dislike'),
                                                 width=50)
             self.dislike_button.grid(row=0, column=0, sticky='e', pady=(0, 10))
