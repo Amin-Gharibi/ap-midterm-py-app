@@ -13,6 +13,8 @@ class CastPage(ctk.CTkScrollableFrame):
     def __init__(self, master, cast_id, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
+        print(cast_id)
+
         self.cast = get_one_cast(cast_id)['targetCast']
 
         self.configure(fg_color='transparent')
@@ -112,7 +114,8 @@ class CastPage(ctk.CTkScrollableFrame):
         latest_movies_container = ItemBoxesContainer(master=self, target_fg_color=header.get_fg_color(),
                                                      title=f'Movies Acted In',
                                                      items=cast_movies,
-                                                     details_page=MoviePage)
+                                                     details_page=MoviePage,
+                                                     base_frame_count=5)
         latest_movies_container.grid(row=6, column=0, sticky='ew')
 
         # comments section

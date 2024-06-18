@@ -72,8 +72,35 @@ class ArticlePage(ctk.CTkScrollableFrame):
                                    text_color='gray', height=10)
         author_role.grid(row=1, column=0, sticky='w')
 
+        self.favorite_status_button = ctk.CTkButton(self, text='Remove From Favorites' if self.article['isArticleInFavorites'] else 'Add To Favorites', command=self.handle_add_remove_favorite)
+        self.favorite_status_button.grid(row=6, column=0, sticky='w', padx=90, pady=(10, 0))
+        if self.article['isArticleInFavorites']:
+            self.favorite_status_button.configure(fg_color='#EF5350', hover_color='#C62828')
+
         page_comments = get_page_comments(self.article['_id'])['pageComments']
 
         # # comments section
         comments_container = CommentsSection(self, page_comments, page_id=self.article['_id'], page_type='Articles')
-        comments_container.grid(row=6, column=0, sticky='ew')
+        comments_container.grid(row=7, column=0, sticky='ew')
+
+    def handle_add_remove_favorite(self):
+        from CTkMessagebox import CTkMessagebox
+
+        if self.article['isArticleInFavorites']:
+            from api_services.articles import delete_favorite_article
+            operation_result = delete_favorite_article(self.article['_id'])
+        else:
+            from api_services.articles import create_favorite_article
+            operation_result = create_favorite_article(self.article['_id'])
+
+        if operation_result['ok']:
+            CTkMessagebox(title='Success', message='Article Deleted From Favorites!' if self.article['isArticleInFavorites'] else 'Article Added To Favorites!', icon='check')
+            if self.article['isArticleInFavorites']:
+                self.favorite_status_button.configure(text='Add To Favorites', fg_color=['#2CC985', '#2FA572'], hover_color=['#0C955A', '#106A43'])
+                self.article['isArticleInFavorites'] = False
+            else:
+                self.favorite_status_button.configure(text='Remove From Favorites', fg_color='#EF5350',
+                                                      hover_color='#C62828')
+                self.article['isArticleInFavorites'] = True
+        else:
+            CTkMessagebox(title='Error', message=operation_result['message'], icon='cancel')

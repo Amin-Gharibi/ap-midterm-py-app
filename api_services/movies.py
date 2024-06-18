@@ -152,7 +152,7 @@ def add_favorite_movie(movie_id: str):
 
         res = req.post(f'{getenv("BASE_URL")}/favorite/movie', json={"movie": movie_id}, headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None
@@ -166,7 +166,7 @@ def delete_favorite_movie(movie_id: str):
 
         res = req.delete(f'{getenv("BASE_URL")}/favorite/movie', json={"movie": movie_id}, headers=headers)
 
-        return res.json()
+        return {**res.json(), "ok": res.ok}
     except Exception as e:
         error_handler(e)
         return None

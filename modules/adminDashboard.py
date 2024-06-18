@@ -19,6 +19,11 @@ class AdminDashboard(ctk.CTkFrame):
         self.grid_rowconfigure(3, weight=1)
 
         self.data = get_me()
+        if not self.data:
+            from modules.loginForm import LoginForm
+            self.destroy()
+            LoginForm(self.master).grid(row=0, column=0)
+
 
         self.welcome_label = ctk.CTkButton(self, text=f"Welcome Dear {self.data['user']['fullName']} ",
                                            fg_color='transparent', hover_color=self.cget('fg_color'),

@@ -5,7 +5,7 @@ from math import floor
 
 
 class ItemBoxesContainer(ctk.CTkFrame):
-    def __init__(self, master, target_fg_color, title, items: list, details_page, container_bg_color=None, **kwargs):
+    def __init__(self, master, target_fg_color, title, items: list, details_page, container_bg_color=None, target_page_id_container=None, base_frame_count=3, **kwargs):
         super().__init__(master, **kwargs)
 
         if container_bg_color is None:
@@ -24,7 +24,9 @@ class ItemBoxesContainer(ctk.CTkFrame):
             (ItemBox(master=self,
                      target_fg_color=target_fg_color,
                      details_page=details_page,
-                     item=item[1])
+                     item=item[1],
+                     base_frame_count=base_frame_count,
+                     target_page_id=item[1][target_page_id_container]['_id'] if target_page_id_container else None)
              .grid(row=floor(item[0] / 4) + 1, column=(item[0] % 4), padx=(50, 0), pady=(50, 0)))
 
         if not len(items):

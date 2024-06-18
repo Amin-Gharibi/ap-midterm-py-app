@@ -8,11 +8,15 @@ from urllib.parse import urlparse
 
 
 class ItemBox(tk.Frame):
-    def __init__(self, master, target_fg_color, details_page, item, *args, **kwargs):
+    def __init__(self, master, target_fg_color, details_page, item, target_page_id=None, base_frame_count=3, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
+        self.base_frame_count = base_frame_count
         self.details_page = details_page
         self.item = item
+        self.target_page_id = self.item['_id']
+        if target_page_id is not None:
+            self.target_page_id = target_page_id
 
         # Configure background color to separate the box from the background
         self.configure(bg=target_fg_color[1], border=10)
@@ -35,7 +39,7 @@ class ItemBox(tk.Frame):
 
         # Rate label
         rate_label = ctk.CTkLabel(self,
-                                  text=f"{self.item.get('movie', self.item.get('article', self.item['cast'])).get('rate', 0) if not 'rate' in self.item else self.item['rate']} {'⭐' * int(self.item.get('movie', self.item.get('article', self.item['cast'])).get('rate', 0) if not 'rate' in self.item.keys() else self.item['rate'])}",
+                                  text=f"{self.item.get('movie', self.item.get('article', self.item.get('cast'))).get('rate', 0) if not 'rate' in self.item else self.item['rate']} {'⭐' * int(self.item.get('movie', self.item.get('article', self.item.get('cast'))).get('rate', 0) if not 'rate' in self.item.keys() else self.item['rate'])}",
                                   fg_color=target_fg_color[1], font=("Arial", 12, 'italic'), text_color='yellow')
         rate_label.grid(row=4, column=0, padx=10, sticky="w")
 
@@ -94,8 +98,12 @@ class ItemBox(tk.Frame):
 
     def on_details_click_handler(self):
         """Handle the details button click by navigating to the details page."""
-        for widget in self.master.master.master.winfo_children():
+        master = self
+        for _ in range(self.base_frame_count):
+            master = master.master
+
+        for widget in master.winfo_children():
             widget.destroy()
 
-        dt_page = self.details_page(self.master.master.master, self.item['_id'])
+        dt_page = self.details_page(master, self.target_page_id)
         dt_page.grid(row=0, column=0, sticky='nsew')

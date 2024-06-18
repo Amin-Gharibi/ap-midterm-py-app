@@ -137,12 +137,19 @@ class MoviePage(ctk.CTkScrollableFrame):
                                   anchor='w', text_color='yellow')
         rate_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
+        self.favorite_status_button = ctk.CTkButton(movie_details_frame, text='Remove From Favorites' if self.movie['isMovieInFavorites'] else 'Add To Favorites', command=self.handle_add_remove_favorite)
+        self.favorite_status_button.grid(row=8, column=0, sticky='w', pady=(10, 0))
+        if self.movie['isMovieInFavorites']:
+            self.favorite_status_button.configure(fg_color='#EF5350', hover_color='#C62828')
+
         # cast section
         cast_container = ItemBoxesContainer(master=self, target_fg_color=['gray86', 'gray17'],
                                             title='Cast',
                                             container_bg_color=rate_frame.cget('bg_color'),
                                             items=self.movie['cast'],
-                                            details_page=CastPage)
+                                            details_page=CastPage,
+                                            target_page_id_container='cast',
+                                            base_frame_count=5)
         cast_container.grid(row=5, column=0, sticky='ew')
         cast_container.section_title.grid(pady=0)
 
@@ -150,3 +157,25 @@ class MoviePage(ctk.CTkScrollableFrame):
         # comments section
         comments_container = CommentsSection(self, movie_comments, page_id=self.movie['_id'], page_type='Movies')
         comments_container.grid(row=6, column=0, sticky='ew')
+
+    def handle_add_remove_favorite(self):
+        from CTkMessagebox import CTkMessagebox
+
+        if self.movie['isMovieInFavorites']:
+            from api_services.movies import delete_favorite_movie
+            operation_result = delete_favorite_movie(self.movie['_id'])
+        else:
+            from api_services.movies import add_favorite_movie
+            operation_result = add_favorite_movie(self.movie['_id'])
+
+        if operation_result['ok']:
+            CTkMessagebox(title='Success', message='Movie Deleted From Favorites!' if self.movie['isMovieInFavorites'] else 'Movie Added To Favorites!', icon='check')
+            if self.movie['isMovieInFavorites']:
+                self.favorite_status_button.configure(text='Add To Favorites', fg_color=['#2CC985', '#2FA572'], hover_color=['#0C955A', '#106A43'])
+                self.movie['isMovieInFavorites'] = False
+            else:
+                self.favorite_status_button.configure(text='Remove From Favorites', fg_color='#EF5350',
+                                                      hover_color='#C62828')
+                self.movie['isMovieInFavorites'] = True
+        else:
+            CTkMessagebox(title='Error', message=operation_result['message'], icon='cancel')

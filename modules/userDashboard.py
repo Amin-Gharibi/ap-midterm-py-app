@@ -23,6 +23,10 @@ class UserDashboard(ctk.CTkFrame):
         self.second_parent = second_parent
 
         self.data = get_me()
+        if not self.data:
+            from modules.loginForm import LoginForm
+            self.destroy()
+            LoginForm(self.master).grid(row=0, column=0)
 
         self.welcome_label = ctk.CTkButton(self, text=f"Welcome Dear {self.data['user']['fullName']} ",
                                            fg_color='transparent', hover_color=self.cget('fg_color'),
@@ -226,9 +230,10 @@ class UserDashboard(ctk.CTkFrame):
 
         # create each comments template from the backend
         for index, comment in enumerate(my_comments):
-            Comment(parent, comment, fg_color='gray23', has_reply_btn=False, has_like_label=True, has_delete_btn=True).grid(row=index + 1, column=0, columnspan=2,
-                                                                                  sticky='ew',
-                                                                                  padx=40, pady=20)
+            Comment(parent, comment, fg_color='gray23', has_reply_btn=False, has_like_label=True,
+                    has_delete_btn=True).grid(row=index + 1, column=0, columnspan=2,
+                                              sticky='ew',
+                                              padx=40, pady=20)
 
         if not len(my_comments):
             ctk.CTkLabel(parent, text='No Comments Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1,
@@ -273,7 +278,8 @@ class UserDashboard(ctk.CTkFrame):
         SectionTitle(holder_frame, text="Favorite Movies").grid(row=0, column=0, sticky='w', padx=20)
 
         for index, movie in enumerate(favorite_movies):
-            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie).grid(
+            ItemBox(holder_frame, target_fg_color=['gray86', 'gray17'], details_page=MoviePage, item=movie,
+                    target_page_id=movie['movie']['_id'], base_frame_count=6).grid(
                 row=floor(index / 4) + 2, column=(index % 4), padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10),
                 pady=10)
 
@@ -399,8 +405,9 @@ class UserDashboard(ctk.CTkFrame):
 
         for index, article in enumerate(favorite_articles):
             ItemBox(master=favorite_articles_holder, target_fg_color=['gray86', 'gray17'], details_page=ArticlePage,
-                    item=article).grid(row=floor(index / 4) + 2, column=(index % 4),
-                                       padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)
+                    item=article, target_page_id=article['article']['_id'], base_frame_count=6).grid(
+                row=floor(index / 4) + 2, column=(index % 4),
+                padx=(40 if (index % 4) == 0 or (index % 4) == 3 else 10), pady=10)
 
         if not len(favorite_articles):
             ctk.CTkLabel(parent, text='No Favorite Articles Yet...', font=('Arial', 16, 'italic'),
