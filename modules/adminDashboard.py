@@ -887,7 +887,7 @@ class AdminDashboard(ctk.CTkFrame):
                 delete_result = delete_cast(self.all_casts[row - 1]['_id'])
                 if delete_result['ok']:
                     CTkMessagebox(title='Success', message='Cast Deleted Successfully!', icon='check')
-                    self.update_all_movies_table()
+                    self.update_all_casts_table()
                 else:
                     CTkMessagebox(title='Error', message='Failed To Delete Cast!', icon='cancel')
 

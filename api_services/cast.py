@@ -74,3 +74,21 @@ def get_top_rated_cast():
         return res.json()
     except Exception as e:
         return error_handler(e)
+
+
+def get_one_cast(cast_id: str):
+    try:
+        res = req.get(f"{getenv('BASE_URL')}/cast/{cast_id}")
+
+        return res.json()
+    except Exception as e:
+        return error_handler(e)
+
+
+def get_cast_movies(cast_id: str):
+    try:
+        res = req.get(f"{getenv('BASE_URL')}/cast/movies/{cast_id}")
+
+        return res.json()
+    except Exception as e:
+        return error_handler(e)

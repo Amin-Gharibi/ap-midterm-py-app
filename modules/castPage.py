@@ -5,13 +5,15 @@ from modules.imageSlider import ImageSlider
 from modules.sectionTitle import SectionTitle
 from modules.itemBoxesContainer import ItemBoxesContainer
 from modules.commentsSection import CommentsSection
+from api_services.cast import get_one_cast, get_cast_movies
+from api_services.comment import get_page_comments
 
 
 class CastPage(ctk.CTkScrollableFrame):
-    def __init__(self, master, user, *args, **kwargs):
+    def __init__(self, master, cast_id, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        self.user = user
+        self.cast = get_one_cast(cast_id)['targetCast']
 
         self.configure(fg_color='transparent')
 
@@ -22,14 +24,14 @@ class CastPage(ctk.CTkScrollableFrame):
         header.grid(row=0, column=0, sticky="ew")
 
         # page title
-        page_title = ctk.CTkLabel(self, text=user['fullName'], font=('Arial', 36, 'italic'))
+        page_title = ctk.CTkLabel(self, text=self.cast['fullName'], font=('Arial', 36, 'italic'))
         page_title.grid(row=1, column=0, sticky="ew", pady=(50, 30))
 
         # image slider
-        image_slider = ImageSlider(self, ['images/imdb_logo.png'])
+        image_slider = ImageSlider(self, self.cast['photos'], image_folder='moviesPictures')
         image_slider.grid(row=2, column=0)
 
-        user_details_title = SectionTitle(self, 'User Details')
+        user_details_title = SectionTitle(self, 'Cast Details')
         user_details_title.grid(row=3, column=0, sticky='w', padx=(35, 0), pady=(50, 0))
 
         # user details frame
@@ -44,7 +46,7 @@ class CastPage(ctk.CTkScrollableFrame):
 
         # biography body label
         biography_label = ctk.CTkLabel(user_details_frame,
-                                       text=self.user['biography'],
+                                       text=self.cast['biography'],
                                        justify='left', anchor='w')
         biography_label.grid(row=1, column=0, sticky="ew", pady=(5, 0))
 
@@ -59,7 +61,7 @@ class CastPage(ctk.CTkScrollableFrame):
         birth_date_title_label.grid(row=2, column=0, sticky='w')
 
         # birth_date body
-        birth_date_label = ctk.CTkLabel(birth_date_frame, text=self.user['birthDate'], justify='left', anchor='w')
+        birth_date_label = ctk.CTkLabel(birth_date_frame, text=self.cast['birthDate'], justify='left', anchor='w')
         birth_date_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # birth_place temp frame
@@ -73,7 +75,7 @@ class CastPage(ctk.CTkScrollableFrame):
         birth_place_title_label.grid(row=2, column=0, sticky='w')
 
         # birth_place body
-        birth_place_label = ctk.CTkLabel(birth_place_frame, text=self.user['birthPlace'], justify='left', anchor='w')
+        birth_place_label = ctk.CTkLabel(birth_place_frame, text=self.cast['birthPlace'], justify='left', anchor='w')
         birth_place_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
         # height temp frame
@@ -87,7 +89,7 @@ class CastPage(ctk.CTkScrollableFrame):
         height_title_label.grid(row=2, column=0, sticky='w')
 
         # height body
-        height_label = ctk.CTkLabel(height_frame, text=f"{self.user['height']} cm", justify='left',
+        height_label = ctk.CTkLabel(height_frame, text=f"{self.cast['height']} cm", justify='left',
                                        anchor='w')
         height_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
@@ -101,87 +103,19 @@ class CastPage(ctk.CTkScrollableFrame):
         rate_title_label.grid(row=2, column=0, sticky='w')
 
         # rate body
-        rate_label = ctk.CTkLabel(rate_frame, text=f"{self.user['rate']} {'⭐' * ceil(self.user['rate'])}", font=('Arial', 14, 'italic'), justify='left',
+        rate_label = ctk.CTkLabel(rate_frame, text=f"{self.cast['rate']} {'⭐' * ceil(self.cast['rate'])}", font=('Arial', 14, 'italic'), justify='left',
                                   anchor='w', text_color='yellow')
         rate_label.grid(row=2, column=1, sticky="w", padx=(5, 0))
 
-        movies_details = [
-            {
-                "id": 0,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "rate": 5
-            },
-            {
-                "id": 1,
-                "title": "After Zendegi",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie.",
-                "cover": "images/imdb_logo.png",
-                "rate": 4.5
-            },
-            {
-                "id": 2,
-                "title": "After Jendegi",
-                "description": "This movie is so amazing.",
-                "cover": "images/imdb_logo.png",
-                "rate": 1.2
-            }
-        ]
-
-        # format descriptions to add \n each 100 char
-        for item in movies_details:
-            item["description"] = format_description(item["description"])
-
-        # create latest movies section
         from modules.moviePage import MoviePage
+        cast_movies = get_cast_movies(self.cast['_id'])['castMovies']
         latest_movies_container = ItemBoxesContainer(master=self, target_fg_color=header.get_fg_color(),
-                                                     title=f'Movies',
-                                                     items=movies_details,
+                                                     title=f'Movies Acted In',
+                                                     items=cast_movies,
                                                      details_page=MoviePage)
         latest_movies_container.grid(row=6, column=0, sticky='ew')
 
-        comments = [
-            {
-                'user': {
-                    'name': 'MohamadAmin Gharibi',
-                    'profile_pic': "images/imdb_logo.png",
-                    'role': 'User'
-                },
-                'body': 'hello world this is test first comment',
-                'rate': 7.5,
-                'responds': [
-                    {
-                        'user': {
-                            'name': 'MohamadAmin Gharibi',
-                            'profile_pic': "images/imdb_logo.png",
-                            'role': 'User'
-                        },
-                        'body': "hello world this is reply first test comment. isn't the UI beautiful? :)"
-                    }
-                ]
-            },
-            {
-                'user': {
-                    'name': 'RFE',
-                    'profile_pic': "images/imdb_logo.png",
-                    'role': 'User'
-                },
-                'body': 'hello world i am gay and this movie is the best of the best',
-                'rate': 1,
-                'responds': [
-                    {
-                        'user': {
-                            'name': 'MohamadAmin Gharibi',
-                            'profile_pic': "images/imdb_logo.png",
-                            'role': 'User'
-                        },
-                        'body': "koskholo nega 😂"
-                    }
-                ]
-            }
-        ]
-
         # comments section
-        comments_container = CommentsSection(self, comments)
+        page_comments = get_page_comments(self.cast['_id'])['pageComments']
+        comments_container = CommentsSection(self, page_comments, page_id=self.cast['_id'], page_type='CastUsers')
         comments_container.grid(row=7, column=0, sticky='ew')
