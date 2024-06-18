@@ -7,6 +7,7 @@ from modules.castPage import CastPage
 from modules.sectionTitle import SectionTitle
 from modules.commentsSection import CommentsSection
 from api_services.movies import get_movie_by_id
+from api_services.comment import get_page_comments
 
 
 class MoviePage(ctk.CTkScrollableFrame):
@@ -145,6 +146,7 @@ class MoviePage(ctk.CTkScrollableFrame):
         cast_container.grid(row=5, column=0, sticky='ew')
         cast_container.section_title.grid(pady=0)
 
+        movie_comments = get_page_comments(self.movie['_id'])['pageComments']
         # comments section
-        comments_container = CommentsSection(self, self.movie['comments'], page_id=self.movie['_id'], page_type='Movies')
+        comments_container = CommentsSection(self, movie_comments, page_id=self.movie['_id'], page_type='Movies')
         comments_container.grid(row=6, column=0, sticky='ew')

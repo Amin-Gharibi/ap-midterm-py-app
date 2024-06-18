@@ -58,7 +58,7 @@ def get_comment_by_id(comment_id: str):
 def create_comment(body: str,
                    page: str,
                    pageModel: str,
-                   rate: int = 0,
+                   rate: int = None,
                    parentComment: str = None):
     try:
 

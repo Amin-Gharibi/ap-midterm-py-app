@@ -1,5 +1,3 @@
-import tkinter
-
 import customtkinter as ctk
 from modules.sectionTitle import SectionTitle
 from modules.comment import Comment
@@ -16,10 +14,11 @@ class CommentsSection(ctk.CTkFrame):
         self.replying_comment_id = None
         self.page_id = page_id
         self.page_type = page_type
+        self.cancel_replying_button = None
+        self.section_title = None
 
         # section title
-        section_title = SectionTitle(self, 'Comments')
-        section_title.grid(row=0, column=0, sticky='w', padx=(30, 0), pady=(50, 0))
+        self.set_section_title('Comments')
 
         # new comment entry box
         self.comment_text_box = ctk.CTkTextbox(self)
@@ -29,9 +28,12 @@ class CommentsSection(ctk.CTkFrame):
         self.rate_entry = ctk.CTkEntry(self, placeholder_text='Enter Your Rate out of 10', width=200)
         self.rate_entry.grid(row=2, column=0, sticky='w', padx=40, pady=(10, 0))
 
+        self.options_frame = ctk.CTkFrame(self, fg_color='transparent')
+        self.options_frame.grid(row=2, column=0, sticky='e', padx=40, pady=(10, 0))
+        self.options_frame.grid_columnconfigure((0, 1), weight=1)
         # submit comment to be added button
-        submit_btn = ctk.CTkButton(self, text='Submit', command=self.submit_comment)
-        submit_btn.grid(row=2, column=0, sticky='e', padx=40, pady=(10, 0))
+        submit_btn = ctk.CTkButton(self.options_frame, text='Submit', command=self.submit_comment)
+        submit_btn.grid(row=0, column=1, sticky='e')
 
         # comments container frame
         comments_container = ctk.CTkFrame(self)
@@ -45,18 +47,33 @@ class CommentsSection(ctk.CTkFrame):
         if not len(comments):
             ctk.CTkLabel(comments_container, text='No Comments Yet...! Be The First One To Tell Your Opinion :)', height=150).grid(row=0, column=0, sticky='ew')
 
+    def set_section_title(self, title):
+        if self.section_title:
+            self.section_title.destroy()
+        self.section_title = SectionTitle(self, title)
+        self.section_title.grid(row=0, column=0, sticky='w', padx=(30, 0), pady=(50, 0))
+
+    def ready_replying(self, title, comment_id):
+        self.rate_entry.grid_forget()
+        self.set_section_title(f'Comments{title}')
+        self.replying_comment_id = comment_id
+        self.cancel_replying_button = ctk.CTkButton(self.options_frame, text='Cancel Replying', command=self.abort_replying)
+        self.cancel_replying_button.grid(row=0, column=0, sticky='e', padx=20)
+        self.comment_text_box.delete("1.0", ctk.END)
+
+    def abort_replying(self):
+        self.rate_entry.grid(row=2, column=0, sticky='w', padx=40, pady=(10, 0))
+        self.set_section_title('Comments')
+        self.cancel_replying_button.grid_forget()
+        self.replying_comment_id = None
+        self.comment_text_box.delete("1.0", ctk.END)
+
     def submit_comment(self):
         from api_services.comment import create_comment
         from CTkMessagebox import CTkMessagebox
-        create_result = create_comment(body=self.comment_text_box.get("1.0", tkinter.END), page=self.page_id, pageModel=self.page_type, rate=self.rate_entry.get(), parentComment=self.replying_comment_id)
+        create_result = create_comment(body=self.comment_text_box.get("1.0", ctk.END), page=self.page_id, pageModel=self.page_type, rate=self.rate_entry.get() or None, parentComment=self.replying_comment_id)
         if create_result['ok']:
             CTkMessagebox(title='Success', message='Your comment submitted successfully!', icon='check')
+            self.abort_replying()
         else:
             CTkMessagebox(title='Success', message=create_result['message'], icon='check')
-
-    def destroy_rate_entry(self):
-        self.rate_entry.destroy()
-
-    def create_rate_entry(self):
-        self.rate_entry = ctk.CTkEntry(self, placeholder_text='Enter Your Rate out of 10', width=200)
-        self.rate_entry.grid(row=2, column=0, sticky='w', padx=40, pady=(10, 0))

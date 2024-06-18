@@ -65,7 +65,7 @@ class Comment(ctk.CTkFrame):
         # if the comment wasn't a response type comment then add reply button
         if not is_reply:
             if has_reply_btn:
-                reply_button = ctk.CTkButton(options_frame, text='Reply', width=50)
+                reply_button = ctk.CTkButton(options_frame, text='Reply', width=50, command=self.handle_replying)
                 reply_button.grid(row=0, column=2, sticky='e', padx=(0, 10), pady=(0, 10))
 
             # user rate label
@@ -107,10 +107,10 @@ class Comment(ctk.CTkFrame):
         if 'replies' in comment.keys() and len(comment['replies']):
             replies_frame = ctk.CTkFrame(self, fg_color='transparent')
             replies_frame.grid_columnconfigure(0, weight=1)
-            replies_frame.grid(row=3, column=0, sticky='ew', padx=20, pady=10)
+            replies_frame.grid(row=3, column=0, sticky='ew', padx=20)
 
-            for index, cmnt in enumerate(comment['responds']):
-                Comment(replies_frame, cmnt, self.master.cget('fg_color'), True).grid(row=index, column=0, sticky='ew')
+            for index, cmnt in enumerate(comment['replies']):
+                Comment(replies_frame, cmnt, self.master.cget('fg_color'), is_reply=True, has_like_button=True).grid(row=index, column=0, sticky='ew', pady=10)
 
     def handle_liking(self, operation):
         from api_services.comment import like_comment, dislike_comment, get_comment_by_id
@@ -149,3 +149,6 @@ class Comment(ctk.CTkFrame):
             self.destroy()
         else:
             CTkMessagebox(title='Error', message=f'Failed To Delete Comment! {delete_result['message']}', icon='cancel')
+
+    def handle_replying(self):
+        self.master.master.ready_replying(title=f' - Replying to {self.comment['user']['username']}', comment_id=self.comment['_id'])
