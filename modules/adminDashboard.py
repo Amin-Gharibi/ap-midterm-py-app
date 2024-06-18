@@ -701,8 +701,9 @@ class AdminDashboard(ctk.CTkFrame):
         column = args[0]['column']
         if row > 0:
             if column == 3:
-                # handle showing details
-                pass
+                from modules.moviePage import MoviePage
+                self.destroy()
+                MoviePage(self.master, movie_id=self.all_movies[row - 1]['_id']).grid(row=0, column=0, sticky='nsew')
             elif column == 4:
                 from api_services.movies import change_movie_status_by_id
                 change_result = change_movie_status_by_id(self.all_movies[row - 1]['_id'])
@@ -773,7 +774,7 @@ class AdminDashboard(ctk.CTkFrame):
                                                  input_placeholder="Enter Birth Place...")
         self.cast_birth_place_entry.grid(row=3, column=1, sticky='w', padx=45)
 
-        self.cast_height_entry = PlainInput(add_new_cast_frame, label_text='Name:',
+        self.cast_height_entry = PlainInput(add_new_cast_frame, label_text='Height:',
                                             input_placeholder="Enter Cast Height...")
         self.cast_height_entry.grid(row=3, column=2, sticky='w', padx=45)
 
@@ -893,8 +894,9 @@ class AdminDashboard(ctk.CTkFrame):
         column = args[0]['column']
         if row > 0:
             if column == 5:
-                # go to details page
-                pass
+                from modules.castPage import CastPage
+                self.destroy()
+                CastPage(self.master, cast_id=self.all_casts[row - 1]['_id']).grid(row=0, column=0, sticky='nsew')
             elif column == 6:
                 # handle edit cast
                 pass
@@ -1010,8 +1012,9 @@ class AdminDashboard(ctk.CTkFrame):
         column = args[0]['column']
         if row > 0:
             if column == 4:
-                # handle showing details
-                pass
+                from modules.articlePage import ArticlePage
+                self.destroy()
+                ArticlePage(self.master, article_id=self.all_articles[row - 1]['_id']).grid(row=0, column=0, sticky='nsew')
             if column == 5:
                 from api_services.articles import delete_article
                 delete_result = delete_article(self.all_articles[row - 1]['_id'])
