@@ -496,20 +496,16 @@ class AdminDashboard(ctk.CTkFrame):
         ctk.CTkButton(movie_cast_frame, text='Search', command=self.search_cast_handler).grid(row=1, column=0,
                                                                                               sticky='w')
 
+        self.cast_results_var = []
+        self.cast_results_check_buttons = []
         ctk.CTkLabel(movie_cast_frame, text='Search Results:', text_color='gray', font=('Arial', 10, 'italic')).grid(
             row=0, column=1)
-        cast_result_frame = ctk.CTkFrame(movie_cast_frame, width=200, height=200)
-        cast_result_frame.grid(row=1, column=1, sticky='nsew')
-        cast_result_frame.grid_columnconfigure(0, weight=1)
-        self.cast_result_box = ctk.CTkFrame(cast_result_frame, fg_color='transparent',
-                                            width=cast_result_frame.cget('width'),
-                                            height=cast_result_frame.cget('height'))
+        self.cast_result_box = ctk.CTkScrollableFrame(movie_cast_frame, width=200, height=200)
+        self.cast_result_box.grid(row=1, column=1, sticky='nsew')
         self.cast_result_box.grid_columnconfigure(0, weight=1)
-        self.cast_result_box.grid_rowconfigure(0, weight=1)
-        self.cast_result_box.grid(row=0, column=0, sticky='nsew')
         ctk.CTkLabel(movie_cast_frame, text='Selected Cast:', text_color='gray', font=('Arial', 10, 'italic')).grid(
             row=0, column=2)
-        self.cast_selected_box = ctk.CTkFrame(movie_cast_frame, width=200, height=200)
+        self.cast_selected_box = ctk.CTkTextbox(movie_cast_frame, width=200, height=200, state='disabled')
         self.cast_selected_box.grid_columnconfigure(0, weight=1)
         self.cast_selected_box.grid(row=1, column=2, sticky='nsew', padx=100)
 
@@ -578,57 +574,33 @@ class AdminDashboard(ctk.CTkFrame):
             CTkMessagebox(title='Error', message=self.cast_search_result['message'], icon='cancel')
 
     def update_searched_casts_table(self, search_result):
-        values = [
-            ["Name", "Select"],
-            *[
-                [
-                    cast['fullName'],
-                    'Select'
-                ] for cast in search_result
-            ]
-        ]
+        for check_button in self.cast_results_check_buttons:
+            check_button.grid_forget()
+        self.cast_results_var = []
+        self.cast_results_check_buttons = []
 
-        if self.movie_casts_table:
-            self.movie_casts_table.destroy()
-        if self.movie_casts_not_found_label:
-            self.movie_casts_not_found_label.destroy()
+        for index, item in enumerate(search_result):
+            var = ctk.BooleanVar()
+            check_button = ctk.CTkCheckBox(self.cast_result_box, text=item['fullName'], variable=var, width=160, command=self.handle_adding_cast)
+            check_button.grid(row=index, column=0, sticky='w', padx=20, pady=10)
+            self.cast_results_var.append((var, item['_id'], item['fullName'], self.search_cast_name_entry.input.get().split(' - ')[2]))
+            self.cast_results_check_buttons.append(check_button)
 
-        if len(values) > 1:
-            self.movie_casts_table = CTkTable(self.cast_result_box, values=values, hover=True,
-                                              column_hover=[1],
-                                              command=self.handle_adding_cast,
-                                              column_hover_text_color=['#F57C00'],
-                                              column_hover_bg_color=['#1B5E20'],
-                                              not_hover_rows=[0])
-            self.movie_casts_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
-        else:
-            self.movie_casts_not_found_label = ctk.CTkLabel(self.cast_result_box,
-                                                            text='No Cast Found...',
-                                                            font=('Arial', 16, 'italic'),
-                                                            text_color='gray',
-                                                            width=self.cast_result_box.cget('width'),
-                                                            height=self.cast_result_box.cget('height'))
-            self.movie_casts_not_found_label.grid(row=0, column=0)
-
-    def handle_adding_cast(self, *args):
-        row = args[0]['row']
-        column = args[0]['column']
-        if row > 0:
-            if column == 1:
-                self.movie_casts.append({"castId": self.cast_search_result['result'][row - 1]['_id'],
-                                         "inMovieName": self.search_cast_name_entry.input.get().split(' - ')[1],
-                                         "inMovieRole": self.search_cast_name_entry.input.get().split(' - ')[2]})
-                # created a temp because the main data doesn't contain the thing that i need to show in the gui
-                self.movie_casts_temp.append([self.cast_search_result['result'][row - 1]['fullName'],
-                                              self.search_cast_name_entry.input.get().split(' - ')[1]])
-                self.update_movie_selected_cast_box()
+    def handle_adding_cast(self):
+        for var, cast_id, *rest in self.cast_results_var:
+            target_obj = {"castId": cast_id,
+                                 "inMovieName": self.search_cast_name_entry.input.get().split(' - ')[1],
+                                 "inMovieRole": self.search_cast_name_entry.input.get().split(' - ')[2]}
+            if var.get() and target_obj not in self.movie_casts:
+                self.movie_casts.append(target_obj)
+        self.update_movie_selected_cast_box()
 
     def update_movie_selected_cast_box(self):
-        for widget in self.cast_selected_box.winfo_children():
-            widget.destroy()
-
-        for index, cast in enumerate(self.movie_casts_temp):
-            ctk.CTkLabel(self.cast_selected_box, text=f"{cast[0]} - {cast[1]}").grid(row=index, column=0)
+        self.cast_selected_box.configure(state='normal')
+        for var, cast_id, full_name, role in self.cast_results_var:
+            if var.get():
+                self.cast_selected_box.insert(ctk.END, f'{full_name} - {role}\n')
+        self.cast_selected_box.configure(state='disabled')
 
     def handle_creating_movie(self, isPublished):
         from api_services.movies import create_movie
