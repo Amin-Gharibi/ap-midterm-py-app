@@ -1127,8 +1127,10 @@ class AdminDashboard(ctk.CTkFrame):
         column = args[0]['column']
         if row > 0:
             if column == 4:
-                # show comment body
-                pass
+                from modules.modalWindow import ModalWindow
+                modal = ModalWindow(self, geometry='400x300', title='Comment')
+                SectionTitle(modal, text='Comment Body:').grid(row=0, column=0, padx=20, pady=(20, 0), sticky='w')
+                ctk.CTkLabel(modal, text=self.all_comments[row - 1]['body'], anchor='w', justify=ctk.LEFT).grid(row=1, column=0, padx=20, pady=10)
             if column == 5:
                 from api_services.comment import approve_comment
                 approve_result = approve_comment(self.all_comments[row - 1]['_id'])
