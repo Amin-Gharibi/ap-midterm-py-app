@@ -53,7 +53,9 @@ class EditArticleModal(ModalWindow):
 
     def select_article_cover(self):
         self.selected_article_cover = filedialog.askopenfilename()
-        self.selected_cover_label.configure(text='Cover Selected Successfully!')
+        self.selected_article_cover = self.selected_article_cover if self.selected_article_cover else None
+        if self.selected_article_cover:
+            self.selected_cover_label.configure(text='Cover Selected Successfully!')
 
     def update_article_handler(self):
         from api_services.articles import update_article

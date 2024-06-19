@@ -19,7 +19,7 @@ class EditUserModal(ModalWindow):
         edit_user_form_frame = ctk.CTkFrame(self, fg_color='transparent')
         edit_user_form_frame.grid_columnconfigure((0, 1), weight=1)
         edit_user_form_frame.grid_rowconfigure((0, 1, 2, 3, 4, 5), weight=1)
-        edit_user_form_frame.grid(row=0, column=0, columnspan=2, sticky='nsew', padx=20, pady=20)
+        edit_user_form_frame.grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
 
         SectionTitle(edit_user_form_frame, text='Edit User ').grid(row=0, column=0, sticky='w', padx=10, pady=(0, 10))
 
@@ -70,20 +70,21 @@ class EditUserModal(ModalWindow):
 
     def select_profile_pic_handler(self):
         self.selected_user_profile = filedialog.askopenfilename()
-        self.selected_profile_label.configure(text='Profile Picture Selected Successfully!')
+        self.selected_user_profile = self.selected_user_profile if self.selected_user_profile else None
+        if self.selected_user_profile:
+            self.selected_profile_label.configure(text='Profile Picture Selected Successfully!')
 
     def handle_updating_user(self):
         from api_services.user import update_user
         from CTkMessagebox import CTkMessagebox
-
-        print(self.password_entry.input.get())
 
         update_result = update_user(user_id=self.user_id,
                                     email=self.email_entry.input.get(),
                                     username=self.username_entry.input.get(),
                                     updatingPassword=self.password_entry.input.get() or None,
                                     fullName=self.full_name_entry.input.get(),
-                                    profilePic=self.selected_user_profile)
+                                    profilePic=self.selected_user_profile,
+                                    role=self.role_entry.get())
 
         if update_result['ok']:
             CTkMessagebox(title='Success', message='User Edited Successfully!', icon='check')

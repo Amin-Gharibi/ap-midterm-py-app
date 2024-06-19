@@ -76,6 +76,10 @@ class CommentsSection(ctk.CTkFrame):
         data = get_me()
         user = data['user'] if data else None
         if user:
+            if not self.rate_entry.get():
+                CTkMessagebox(title='Attention', message='You Have To Enter A Rate!')
+                return
+
             create_result = create_comment(body=self.comment_text_box.get("1.0", ctk.END), page=self.page_id, pageModel=self.page_type, rate=self.rate_entry.get() or None, parentComment=self.replying_comment_id)
             if create_result['ok']:
                 CTkMessagebox(title='Success', message='Your comment submitted successfully!', icon='check')

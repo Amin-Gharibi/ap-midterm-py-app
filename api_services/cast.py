@@ -49,6 +49,46 @@ def create_cast(fullName: str,
         return None
 
 
+def edit_cast(cast_id: str,
+              fullName: str = None,
+              biography: str = None,
+              birthDate: str = None,
+              birthPlace: str = None,
+              profilePic: str = None,
+              photos: tuple = None,
+              height: str = None):
+    try:
+        data = {
+            "fullName": fullName,
+            "biography": biography,
+            "birthDate": birthDate,
+            "birthPlace": birthPlace,
+            "height": height
+        }
+
+        headers = {
+            "Authorization": f"Bearer {get_access_token()}"
+        }
+
+        # Prepare profile picture for the request
+        files = []
+        if profilePic:
+            files.append(("profilePic", ("profilePic.jpg", open(profilePic, 'rb'), "image/jpeg")))
+
+        # Prepare photo files for the request
+        if photos and len(photos):
+            photo_files = [("photos", (f"photo{index}.jpg", open(photo, 'rb'), "image/jpeg")) for index, photo in enumerate(photos)]
+            # Add photo files to the list of files
+            files.extend(photo_files)
+
+        res = req.put(f"{getenv('BASE_URL')}/cast/{cast_id}", data=data, files=files, headers=headers)
+
+        return {**res.json(), "ok": res.ok}
+    except Exception as e:
+        error_handler(e)
+        return None
+
+
 def get_all_casts():
     try:
         headers = {

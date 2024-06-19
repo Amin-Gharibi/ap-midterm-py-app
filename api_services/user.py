@@ -48,6 +48,7 @@ def update_user(user_id: str,
                 currentPassword: str = None,
                 updatingPassword: str = None,
                 fullName: str = None,
+                role: str = None,
                 profilePic=None):
     try:
         sending_data = {key: value for key, value in locals().items()}

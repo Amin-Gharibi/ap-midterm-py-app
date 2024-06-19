@@ -878,6 +878,7 @@ class AdminDashboard(ctk.CTkFrame):
         if len(all_casts_list) > 1:
             self.all_casts_table = CTkTable(self.all_casts_frame, values=all_casts_list, hover=True,
                                             column_hover=[5, 6, 7],
+                                            command=self.handle_casts_funcs,
                                             column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
                                             column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'],
                                             not_hover_rows=[0])
@@ -898,8 +899,8 @@ class AdminDashboard(ctk.CTkFrame):
                 self.destroy()
                 CastPage(self.master, cast_id=self.all_casts[row - 1]['_id']).grid(row=0, column=0, sticky='nsew')
             elif column == 6:
-                # handle edit cast
-                pass
+                from modules.editCastModal import EditCastModal
+                EditCastModal(self, cast_id=self.all_casts[row - 1]['_id'])
             elif column == 7:
                 from api_services.cast import delete_cast
                 delete_result = delete_cast(self.all_casts[row - 1]['_id'])
@@ -1175,6 +1176,7 @@ class AdminDashboard(ctk.CTkFrame):
         if len(all_waiting_comments) > 1:
             self.all_comments_table = CTkTable(self.all_waiting_comments_frame, values=all_waiting_comments, hover=True,
                                                column_hover=[4, 5, 6],
+                                               command=self.handle_comments_funcs,
                                                column_hover_text_color=['#F57C00', '#F57C00', '#F57C00'],
                                                column_hover_bg_color=['#1B5E20', '#1B5E20', '#B71C1C'],
                                                not_hover_rows=[0])
