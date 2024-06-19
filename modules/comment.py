@@ -147,8 +147,15 @@ class Comment(ctk.CTkFrame):
         if delete_result['ok']:
             CTkMessagebox(title='Success', message='Comment Deleted Successfully!', icon='check')
             self.destroy()
+            self.master.update_comments_list_handler()
         else:
             CTkMessagebox(title='Error', message=f'Failed To Delete Comment! {delete_result['message']}', icon='cancel')
 
     def handle_replying(self):
-        self.master.master.ready_replying(title=f' - Replying to {self.comment['user']['username']}', comment_id=self.comment['_id'])
+        data = get_me()
+        user = data['user'] if data else None
+        if user:
+            self.master.master.ready_replying(title=f' - Replying to {self.comment['user']['username']}', comment_id=self.comment['_id'])
+        else:
+            from CTkMessagebox import CTkMessagebox
+            CTkMessagebox(title='Attention', message='For Replying On Comments You Have To Login First!')

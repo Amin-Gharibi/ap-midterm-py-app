@@ -366,8 +366,8 @@ class AdminDashboard(ctk.CTkFrame):
         column = args[0]['column']
         if row > 0:
             if column == 5:
-                # handle editing user
-                pass
+                from modules.editUserModal import EditUserModal
+                EditUserModal(self, user_id=self.all_users[row - 1]['_id'])
             if column == 6:
                 from api_services.user import delete_user
                 delete_result = delete_user(self.all_users[row - 1]['_id'])

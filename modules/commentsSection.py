@@ -72,9 +72,15 @@ class CommentsSection(ctk.CTkFrame):
     def submit_comment(self):
         from api_services.comment import create_comment
         from CTkMessagebox import CTkMessagebox
-        create_result = create_comment(body=self.comment_text_box.get("1.0", ctk.END), page=self.page_id, pageModel=self.page_type, rate=self.rate_entry.get() or None, parentComment=self.replying_comment_id)
-        if create_result['ok']:
-            CTkMessagebox(title='Success', message='Your comment submitted successfully!', icon='check')
-            self.abort_replying()
+        from api_services.auth import get_me
+        data = get_me()
+        user = data['user'] if data else None
+        if user:
+            create_result = create_comment(body=self.comment_text_box.get("1.0", ctk.END), page=self.page_id, pageModel=self.page_type, rate=self.rate_entry.get() or None, parentComment=self.replying_comment_id)
+            if create_result['ok']:
+                CTkMessagebox(title='Success', message='Your comment submitted successfully!', icon='check')
+                self.abort_replying()
+            else:
+                CTkMessagebox(title='Success', message=create_result['message'], icon='cancel')
         else:
-            CTkMessagebox(title='Success', message=create_result['message'], icon='check')
+            CTkMessagebox(title='Attention', message='For Commenting You Have To Login First!')

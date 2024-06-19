@@ -200,7 +200,7 @@ class UserDashboard(ctk.CTkFrame):
         from modules.sectionTitle import SectionTitle
         from api_services.comment import get_my_comments
 
-        my_comments = get_my_comments()['userComments']
+        self.my_comments = get_my_comments()['userComments']
 
         # if the function was used from AdminDashboard then change the btn container and disable buttons there
         if btn_container is None:
@@ -229,13 +229,24 @@ class UserDashboard(ctk.CTkFrame):
         SectionTitle(parent, 'My Comments').grid(row=0, column=0, sticky='w', padx=30, pady=10)
 
         # create each comments template from the backend
-        for index, comment in enumerate(my_comments):
+        for index, comment in enumerate(self.my_comments):
             Comment(parent, comment, fg_color='gray23', has_reply_btn=False, has_like_label=True,
                     has_delete_btn=True).grid(row=index + 1, column=0, columnspan=2,
                                               sticky='ew',
                                               padx=40, pady=20)
 
-        if not len(my_comments):
+        if not len(self.my_comments):
+            ctk.CTkLabel(parent, text='No Comments Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1,
+                                                                                                                  column=0,
+                                                                                                                  columnspan=2)
+        # did this to access update comments list function without passing parent from another page
+        # that it's being called
+        parent.update_comments_list_handler = lambda: self.update_comments_list(parent)
+
+    def update_comments_list(self, parent):
+        from api_services.comment import get_my_comments
+        self.my_comments = get_my_comments()['userComments']
+        if not len(self.my_comments):
             ctk.CTkLabel(parent, text='No Comments Yet...', font=('Arial', 16, 'italic'), text_color='gray').grid(row=1,
                                                                                                                   column=0,
                                                                                                                   columnspan=2)

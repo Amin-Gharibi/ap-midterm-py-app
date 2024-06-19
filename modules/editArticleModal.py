@@ -11,20 +11,20 @@ class EditArticleModal(ModalWindow):
         super().__init__(master, geometry='700x550', title='Edit Article')
 
         self.article_id = article_id
-        self.article = get_article_by_id(article_id)['targetArticle']
+        self.article = get_article_by_id(self.article_id)['targetArticle']
 
         self.grid_columnconfigure(0, weight=1)
 
-        add_new_article_frame = ctk.CTkFrame(self, fg_color='transparent')
-        add_new_article_frame.grid_columnconfigure((0, 1, 2), weight=1)
-        add_new_article_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
-        SectionTitle(add_new_article_frame, text='Edit Article').grid(row=0, column=0, sticky='w', padx=30,
+        edit_article_form_frame = ctk.CTkFrame(self, fg_color='transparent')
+        edit_article_form_frame.grid_columnconfigure((0, 1, 2), weight=1)
+        edit_article_form_frame.grid(row=0, column=0, columnspan=2, sticky='ew', pady=20)
+        SectionTitle(edit_article_form_frame, text='Edit Article').grid(row=0, column=0, sticky='w', padx=30,
                                                                          pady=(0, 20))
-        self.article_title_entry = PlainInput(add_new_article_frame, label_text='Article Title:',
+        self.article_title_entry = PlainInput(edit_article_form_frame, label_text='Article Title:',
                                               input_placeholder="Enter Article Title...", input_value=self.article['title'])
         self.article_title_entry.grid(row=1, column=0, sticky='w', padx=45)
 
-        article_body_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        article_body_frame = ctk.CTkFrame(edit_article_form_frame, fg_color='transparent')
         article_body_frame.grid_columnconfigure(0, weight=1)
         article_body_frame.grid(row=2, column=0, columnspan=3, sticky="ew", padx=45, pady=10)
         ctk.CTkLabel(article_body_frame, text='Article Body:', text_color='gray',
@@ -36,7 +36,7 @@ class EditArticleModal(ModalWindow):
         self.article_body_entry.insert("1.0", self.article['body'])
 
         self.selected_article_cover = None
-        article_cover_frame = ctk.CTkFrame(add_new_article_frame, fg_color='transparent')
+        article_cover_frame = ctk.CTkFrame(edit_article_form_frame, fg_color='transparent')
         article_cover_frame.grid(row=3, column=0, columnspan=3, sticky="ew", padx=45, pady=20)
         ctk.CTkLabel(article_cover_frame, text='Article Cover:', text_color='gray',
                      font=("Arial", 12, "italic")).grid(

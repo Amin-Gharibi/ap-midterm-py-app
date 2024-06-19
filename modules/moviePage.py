@@ -160,6 +160,13 @@ class MoviePage(ctk.CTkScrollableFrame):
 
     def handle_add_remove_favorite(self):
         from CTkMessagebox import CTkMessagebox
+        from api_services.auth import get_me
+
+        data = get_me()
+        user = data['user'] if data else None
+        if user is None:
+            CTkMessagebox(title='Attention', message='For Adding Movie To Your Favorites You Need To Login First!')
+            return None
 
         if self.movie['isMovieInFavorites']:
             from api_services.movies import delete_favorite_movie

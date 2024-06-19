@@ -85,6 +85,13 @@ class ArticlePage(ctk.CTkScrollableFrame):
 
     def handle_add_remove_favorite(self):
         from CTkMessagebox import CTkMessagebox
+        from api_services.auth import get_me
+
+        data = get_me()
+        user = data['user'] if data else None
+        if user is None:
+            CTkMessagebox(title='Attention', message='For Adding Article To Your Favorites You Need To Login First!')
+            return None
 
         if self.article['isArticleInFavorites']:
             from api_services.articles import delete_favorite_article
