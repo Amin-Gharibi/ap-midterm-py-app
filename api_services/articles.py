@@ -100,13 +100,26 @@ def update_article(article_id: str,
                    body: str = None,
                    cover: str = None):
     try:
+        sending_data = {
+            "title": title,
+            "body": body
+        }
+
+        files = None
+        if cover:
+            files = {
+                "cover": open(cover, 'rb')
+            }
+
         headers = {
             "Authorization": f"Bearer {get_access_token()}"
         }
 
-        res = req.put(f"{getenv('BASE_URL')}/article/{article_id}", headers=headers)
+        form_data = {key: str(value) for key, value in sending_data.items()}
 
-        return res.json()
+        res = req.put(f"{getenv('BASE_URL')}/article/{article_id}", data=form_data, files=files, headers=headers)
+
+        return {**res.json(), 'ok': res.ok}
     except Exception as e:
         error_handler(e)
         return None

@@ -52,10 +52,10 @@ class AdminDashboard(ctk.CTkFrame):
                                                            dynamic_content_frame, self))
         self.my_favorite_movies_button.grid(row=0, column=2, padx=20, pady=20)
 
-        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Articles",
-                                                         command=lambda: user_dashboard.load_my_favorite_articles_tab(
+        self.my_articles_button = ctk.CTkButton(navbar_frame, text="My Articles",
+                                                         command=lambda: user_dashboard.load_my_articles_tab(
                                                              dynamic_content_frame, self))
-        self.my_favorite_articles_button.grid(row=0, column=3, padx=20, pady=20)
+        self.my_articles_button.grid(row=0, column=3, padx=20, pady=20)
 
         self.users_button = ctk.CTkButton(navbar_frame, text="Users",
                                           command=lambda: self.load_users_tab(dynamic_content_frame))
@@ -101,7 +101,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.my_profile_button.configure(state='normal')
         self.my_comments_button.configure(state='normal')
         self.my_favorite_movies_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        self.my_articles_button.configure(state='normal')
         self.movies_button.configure(state='normal')
         self.articles_button.configure(state='normal')
         self.comments_button.configure(state='normal')
@@ -407,7 +407,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.my_profile_button.configure(state='normal')
         self.my_comments_button.configure(state='normal')
         self.my_favorite_movies_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        self.my_articles_button.configure(state='normal')
         self.users_button.configure(state='normal')
         self.articles_button.configure(state='normal')
         self.comments_button.configure(state='normal')
@@ -738,7 +738,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.my_profile_button.configure(state='normal')
         self.my_comments_button.configure(state='normal')
         self.my_favorite_movies_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        self.my_articles_button.configure(state='normal')
         self.users_button.configure(state='normal')
         self.movies_button.configure(state='normal')
         self.comments_button.configure(state='normal')
@@ -950,7 +950,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.my_profile_button.configure(state='normal')
         self.my_comments_button.configure(state='normal')
         self.my_favorite_movies_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        self.my_articles_button.configure(state='normal')
         self.users_button.configure(state='normal')
         self.movies_button.configure(state='normal')
         self.comments_button.configure(state='normal')
@@ -1072,7 +1072,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.my_profile_button.configure(state='normal')
         self.my_comments_button.configure(state='normal')
         self.my_favorite_movies_button.configure(state='normal')
-        self.my_favorite_articles_button.configure(state='normal')
+        self.my_articles_button.configure(state='normal')
         self.users_button.configure(state='normal')
         self.articles_button.configure(state='normal')
         self.movies_button.configure(state='normal')

@@ -52,10 +52,10 @@ class UserDashboard(ctk.CTkFrame):
                                                            dynamic_content_frame, self))
         self.my_favorite_movies_button.grid(row=0, column=2, padx=20, pady=20)
 
-        self.my_favorite_articles_button = ctk.CTkButton(navbar_frame, text="My Articles",
-                                                         command=lambda: self.load_my_favorite_articles_tab(
+        self.my_articles_button = ctk.CTkButton(navbar_frame, text="My Articles",
+                                                         command=lambda: self.load_my_articles_tab(
                                                              dynamic_content_frame, self))
-        self.my_favorite_articles_button.grid(row=0, column=3, padx=20, pady=20)
+        self.my_articles_button.grid(row=0, column=3, padx=20, pady=20)
 
         # this frame would contain each tab's content
         dynamic_content_frame = ctk.CTkScrollableFrame(self)
@@ -92,7 +92,7 @@ class UserDashboard(ctk.CTkFrame):
         btn_container.my_profile_button.configure(state='disabled')
         btn_container.my_comments_button.configure(state='normal')
         btn_container.my_favorite_movies_button.configure(state='normal')
-        btn_container.my_favorite_articles_button.configure(state='normal')
+        btn_container.my_articles_button.configure(state='normal')
         if hasattr(btn_container, 'users_button'):
             btn_container.users_button.configure(state='normal')
         if hasattr(btn_container, 'movies_button'):
@@ -210,7 +210,7 @@ class UserDashboard(ctk.CTkFrame):
         btn_container.my_comments_button.configure(state='disabled')
         btn_container.my_profile_button.configure(state='normal')
         btn_container.my_favorite_movies_button.configure(state='normal')
-        btn_container.my_favorite_articles_button.configure(state='normal')
+        btn_container.my_articles_button.configure(state='normal')
         if hasattr(btn_container, 'users_button'):
             btn_container.users_button.configure(state='normal')
         if hasattr(btn_container, 'movies_button'):
@@ -257,7 +257,7 @@ class UserDashboard(ctk.CTkFrame):
         btn_container.my_favorite_movies_button.configure(state='disabled')
         btn_container.my_profile_button.configure(state='normal')
         btn_container.my_comments_button.configure(state='normal')
-        btn_container.my_favorite_articles_button.configure(state='normal')
+        btn_container.my_articles_button.configure(state='normal')
         if hasattr(btn_container, 'users_button'):
             btn_container.users_button.configure(state='normal')
         if hasattr(btn_container, 'movies_button'):
@@ -291,7 +291,7 @@ class UserDashboard(ctk.CTkFrame):
         self.selected_article_cover = filedialog.askopenfilename()
         self.selected_cover_label.configure(text='Cover Selected Successfully!')
 
-    def load_my_favorite_articles_tab(self, parent, btn_container):
+    def load_my_articles_tab(self, parent, btn_container):
         from modules.itemBox import ItemBox
         from modules.articlePage import ArticlePage
         from math import floor
@@ -306,7 +306,7 @@ class UserDashboard(ctk.CTkFrame):
             btn_container = self
 
         # disable target tab button and enable other tabs button
-        btn_container.my_favorite_articles_button.configure(state='disabled')
+        btn_container.my_articles_button.configure(state='disabled')
         btn_container.my_profile_button.configure(state='normal')
         btn_container.my_comments_button.configure(state='normal')
         btn_container.my_favorite_movies_button.configure(state='normal')
@@ -492,8 +492,8 @@ class UserDashboard(ctk.CTkFrame):
                 else:
                     CTkMessagebox(title='Error', message="Error In Changing Article Status!", icon='cancel')
             elif column == 6:
-                # handle editing article
-                pass
+                from modules.editArticleModal import EditArticleModal
+                EditArticleModal(self, article_id=self.my_articles[row - 1]['_id'])
             elif column == 7:
                 from api_services.articles import delete_article
 
