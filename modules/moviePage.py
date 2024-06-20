@@ -21,7 +21,7 @@ class MoviePage(ctk.CTkScrollableFrame):
 
         # header navbar
         header = HeaderNavBar(self, parent_count=4)
-        header.grid(row=0, column=0, sticky="ew")
+        header.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
 
         # page title
         # add space after movie title because the font is italic

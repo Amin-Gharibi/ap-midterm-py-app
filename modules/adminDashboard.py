@@ -798,9 +798,9 @@ class AdminDashboard(ctk.CTkFrame):
         ctk.CTkButton(cast_profile_pic_frame, text='Add Profile', command=self.select_cast_profile_pic).grid(row=1,
                                                                                                              column=0,
                                                                                                              sticky='w')
-        selected_profile_pic_label = ctk.CTkLabel(cast_profile_pic_frame,
-                                                  text=self.cast_profile_pic and 'Cast Profile Has Been Selected!' or 'Please Select Cast Profile')
-        selected_profile_pic_label.grid(row=0, column=1, padx=20)
+        self.cast_selected_profile_pic_label = ctk.CTkLabel(cast_profile_pic_frame,
+                                                  text='Please Select Cast Profile')
+        self.cast_selected_profile_pic_label.grid(row=0, column=1, padx=20)
 
         cast_page_photos_frame = ctk.CTkFrame(add_new_cast_frame, fg_color='transparent')
         cast_page_photos_frame.grid(row=4, column=1, columnspan=3, sticky="ew", padx=45, pady=20)
@@ -810,9 +810,9 @@ class AdminDashboard(ctk.CTkFrame):
         ctk.CTkButton(cast_page_photos_frame, text='Add Photos', command=self.select_cast_page_pics).grid(row=1,
                                                                                                           column=0,
                                                                                                           sticky='w')
-        selected_page_pics_label = ctk.CTkLabel(cast_page_photos_frame,
-                                                text=self.cast_profile_pic and 'Cast Page Photos Have Been Selected!' or 'Please Select Cast Page Photos')
-        selected_page_pics_label.grid(row=0, column=1, padx=20)
+        self.cast_selected_page_pics_label = ctk.CTkLabel(cast_page_photos_frame,
+                                                text='Please Select Cast Page Photos')
+        self.cast_selected_page_pics_label.grid(row=0, column=1, padx=20)
 
         ctk.CTkButton(add_new_cast_frame, text='Create', command=self.handle_creating_cast).grid(row=5, column=0,
                                                                                                  columnspan=3,
@@ -934,9 +934,15 @@ class AdminDashboard(ctk.CTkFrame):
 
     def select_cast_page_pics(self):
         self.cast_page_photos = filedialog.askopenfilenames()
+        self.cast_page_photos = self.cast_page_photos if self.cast_page_photos else None
+        if self.cast_page_photos is not None:
+            self.cast_selected_page_pics_label.configure(text='Cast Page Photos Have Been Selected!')
 
     def select_cast_profile_pic(self):
         self.cast_profile_pic = filedialog.askopenfilename()
+        self.cast_profile_pic = self.cast_profile_pic if self.cast_profile_pic else None
+        if self.cast_profile_pic is not None:
+            self.cast_selected_profile_pic_label.configure(text='Cast Profile Has Been Selected!')
 
     def handle_creating_cast(self):
         from api_services.cast import create_cast

@@ -21,7 +21,7 @@ class CastPage(ctk.CTkScrollableFrame):
 
         # header navbar
         header = HeaderNavBar(self, parent_count=4)
-        header.grid(row=0, column=0, sticky="ew")
+        header.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
 
         # page title
         page_title = ctk.CTkLabel(self, text=self.cast['fullName'], font=('Arial', 36, 'italic'))
