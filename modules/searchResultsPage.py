@@ -4,6 +4,7 @@ from modules.itemBoxesContainer import ItemBoxesContainer
 from modules.moviePage import MoviePage
 from modules.articlePage import ArticlePage
 from modules.castPage import CastPage
+from api_services.universalSearch import universal_search
 
 
 class SearchResultsPage(ctk.CTkScrollableFrame):
@@ -11,6 +12,10 @@ class SearchResultsPage(ctk.CTkScrollableFrame):
         super().__init__(master, *args, **kwargs)
 
         self.searching_text = searching_text
+        results = universal_search(self.searching_text)
+        self.movie_results = results['movies']
+        self.article_results = results['articles']
+        self.cast_results = results['castUsers']
 
         self.configure(fg_color=self.cget('bg_color'))
         self.grid_columnconfigure(0, weight=1)
@@ -21,110 +26,9 @@ class SearchResultsPage(ctk.CTkScrollableFrame):
 
         # page title
         # add space after movie title because the font is italic
-        page_title = ctk.CTkLabel(self, text=f'Search Results For:\n{self.searching_text}', font=('Arial', 36, 'italic'))
+        page_title = ctk.CTkLabel(self, text=f'Search Results For:\n{self.searching_text}',
+                                  font=('Arial', 36, 'italic'))
         page_title.grid(row=1, column=0, sticky="ew", pady=(50, 30))
-
-        # example results
-        self.movie_results = [
-            {
-                "id": 5,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            },
-            {
-                "id": 6,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            },
-            {
-                "id": 7,
-                "title": "After Life",
-                "description": "This movie is so amazing and i would definitely suggest you to watch this super amazing movie. seriously i mean it hatman nagash konid",
-                "cover": "images/imdb_logo.png",
-                "genre": "romance, comedy",
-                "releaseDate": "23/05/2024",
-                "countries": "United States Of America, United Arab Emirates",
-                "languages": "English(US)",
-                "budget": 100_000_000,
-                "rate": 5
-            }
-        ]
-
-        self.article_results = [
-            {
-                "id": 0,
-                "title": "Article 1",
-                "cover": "images/imdb_logo.png",
-                "body": "this is bullshit body dude",
-                "author": {
-                    "id": 0,
-                    "fullName": "MohamadAmin Gharibi",
-                    "profilePic": "images/imdb_logo.png",
-                    "role": "User"
-                },
-                "rate": 2
-            },
-            {
-                "id": 0,
-                "title": "Article 2",
-                "cover": "images/imdb_logo.png",
-                "body": "this is kossher body dude",
-                "author": {
-                    "id": 0,
-                    "fullName": "MohamadAmin Gharibi",
-                    "profilePic": "images/imdb_logo.png",
-                    "role": "User"
-                },
-                "rate": 4.5
-            }
-        ]
-
-        self.actor_results = [
-            {
-                "id": 0,
-                "profilePic": "images/imdb_logo.png",
-                "fullName": "MohamadAmin Gharibi",
-                "biography": "",
-                "rate": 4.5,
-                "height": 178,
-                "birthDate": "14/07/2005",
-                "birthPlace": "Minab, Hormozgan, Iran"
-            },
-            {
-                "id": 1,
-                "profilePic": "images/imdb_logo.png",
-                "fullName": "MohamadAmin Gharibi",
-                "biography": "",
-                "rate": 4.5,
-                "height": 178,
-                "birthDate": "14/07/2005",
-                "birthPlace": "Minab, Hormozgan, Iran"
-            },
-            {
-                "id": 2,
-                "profilePic": "images/imdb_logo.png",
-                "fullName": "MohamadAmin Gharibi",
-                "biography": "",
-                "rate": 4.5,
-                "height": 178,
-                "birthDate": "14/07/2005",
-                "birthPlace": "Minab, Hormozgan, Iran"
-            }
-        ]
 
         # place movie results
         movie_results_container = ItemBoxesContainer(master=self, target_fg_color=header.get_fg_color(),
@@ -143,10 +47,10 @@ class SearchResultsPage(ctk.CTkScrollableFrame):
         article_results_container.section_title.grid(pady=(20, 0))
         article_results_container.grid(row=3, column=0, sticky='ew', pady=20)
 
-        # place actor results
-        actor_results_container = ItemBoxesContainer(master=self, target_fg_color=header.get_fg_color(),
-                                                     title='Actors',
-                                                     items=self.actor_results,
-                                                     details_page=CastPage)
-        actor_results_container.section_title.grid(pady=(20, 0))
-        actor_results_container.grid(row=4, column=0, sticky='ew')
+        # place casts results
+        cast_results_container = ItemBoxesContainer(master=self, target_fg_color=header.get_fg_color(),
+                                                    title='Casts',
+                                                    items=self.cast_results,
+                                                    details_page=CastPage)
+        cast_results_container.section_title.grid(pady=(20, 0))
+        cast_results_container.grid(row=4, column=0, sticky='ew')
