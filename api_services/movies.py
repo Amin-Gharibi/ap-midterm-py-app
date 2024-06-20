@@ -58,24 +58,16 @@ def create_movie(fullName: str,
             "Authorization": f"Bearer {get_access_token()}"
         }
 
-        # Prepare files for the request
-        with open(cover, 'rb') as profile_pic_file:
-            # Start the list of files with the profile picture
-            files = [
-                ("cover", ("cover.jpg", profile_pic_file, "image/jpeg"))
-            ]
+        files = []
+        if cover:
+            files.append(("cover", ("cover.jpg", open(cover, 'rb'), "image/jpeg")))
 
-            # Prepare photo files for the request
+        if medias and len(medias):
             photo_files = [("medias", (f"media{index}.jpg", open(photo, 'rb'), "image/jpeg")) for index, photo in
                            enumerate(medias)]
-
-            # Add photo files to the list of files
             files.extend(photo_files)
 
-            res = req.post(f"{getenv('BASE_URL')}/movie", data=data, files=files, headers=headers)
-
-        for _, (_, photo_file, _) in photo_files:
-            photo_file.close()
+        res = req.post(f"{getenv('BASE_URL')}/movie", data=data, files=files, headers=headers)
 
         return {**res.json(), "ok": res.ok}
     except Exception as e:
@@ -83,33 +75,47 @@ def create_movie(fullName: str,
         return None
 
 
-def update_movie_by_id(movie_id: str,
-                       fullName: str = None,
-                       summary: str = None,
-                       genre: str = None,
-                       releaseDate: str = None,
-                       countries: str = None,
-                       language: str = None,
-                       budget: str = None,
-                       cover: str = None,
-                       medias: list = None,
-                       cast: list = None,
-                       isPublished: bool = None):
+def update_movie(movie_id: str,
+                 fullName: str = None,
+                 summary: str = None,
+                 genre: str = None,
+                 releaseDate: str = None,
+                 countries: str = None,
+                 language: str = None,
+                 budget: str = None,
+                 cover: str = None,
+                 medias: list = None,
+                 cast: list = None):
     try:
-        sending_data = {key: value for key, value in locals().items()}
+        data = {
+            "fullName": fullName,
+            "summary": summary,
+            "genre": genre,
+            "releaseDate": releaseDate,
+            "countries": countries,
+            "movieLanguage": language,
+            "budget": budget
+        }
+
+        for index, cst in enumerate(cast):
+            data[f"cast[{index}][castId]"] = cst['castId']
+            data[f"cast[{index}][inMovieName]"] = cst['inMovieName']
+            data[f"cast[{index}][inMovieRole]"] = cst['inMovieRole']
 
         headers = {
             "Authorization": f"Bearer {get_access_token()}"
         }
 
-        files = {
-            "cover": open(cover, 'rb'),
-        }
+        files = []
+        if cover:
+            files.append(("cover", ("cover.jpg", open(cover, 'rb'), "image/jpeg")))
 
-        for index, media in enumerate(medias):
-            files[f"medias[{index}]"] = open(media, 'rb')
+        if medias and len(medias):
+            photo_files = [("medias", (f"media{index}.jpg", open(photo, 'rb'), "image/jpeg")) for index, photo in
+                           enumerate(medias)]
+            files.extend(photo_files)
 
-        res = req.post(f"{getenv('BASE_URL')}/movie/{movie_id}", json=sending_data, files=files, headers=headers)
+        res = req.put(f"{getenv('BASE_URL')}/movie/{movie_id}", data=data, files=files, headers=headers)
 
         return {**res.json(), "ok": res.ok}
     except Exception as e:

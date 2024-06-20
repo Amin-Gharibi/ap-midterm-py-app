@@ -481,9 +481,7 @@ class AdminDashboard(ctk.CTkFrame):
         self.selected_movie_medias_count_label.grid(row=0, column=1, padx=20)
 
         self.movie_casts = []
-        self.movie_casts_temp = []
-        self.movie_casts_table = None
-        self.movie_casts_not_found_label = None
+        self.duplicate_movie_casts = []
         movie_cast_frame = ctk.CTkFrame(add_new_movie_frame, fg_color='transparent')
         movie_cast_frame.grid_columnconfigure((0, 1, 2), weight=1)
         movie_cast_frame.grid(row=6, column=0, columnspan=3, sticky="ew", padx=45)
@@ -496,7 +494,6 @@ class AdminDashboard(ctk.CTkFrame):
         ctk.CTkButton(movie_cast_frame, text='Search', command=self.search_cast_handler).grid(row=1, column=0,
                                                                                               sticky='w')
 
-        self.cast_results_var = []
         self.cast_results_check_buttons = []
         ctk.CTkLabel(movie_cast_frame, text='Search Results:', text_color='gray', font=('Arial', 10, 'italic')).grid(
             row=0, column=1)
@@ -505,7 +502,9 @@ class AdminDashboard(ctk.CTkFrame):
         self.cast_result_box.grid_columnconfigure(0, weight=1)
         ctk.CTkLabel(movie_cast_frame, text='Selected Cast:', text_color='gray', font=('Arial', 10, 'italic')).grid(
             row=0, column=2)
-        self.cast_selected_box = ctk.CTkTextbox(movie_cast_frame, width=200, height=200, state='disabled')
+
+        self.cast_selected_check_buttons = []
+        self.cast_selected_box = ctk.CTkScrollableFrame(movie_cast_frame, width=200, height=200)
         self.cast_selected_box.grid_columnconfigure(0, weight=1)
         self.cast_selected_box.grid(row=1, column=2, sticky='nsew', padx=100)
 
@@ -561,46 +560,23 @@ class AdminDashboard(ctk.CTkFrame):
 
     def select_movie_cover_handler(self):
         self.movie_cover = filedialog.askopenfilename()
+        self.movie_cover = self.movie_cover if self.movie_cover else None
+        if self.movie_cover is not None:
+            self.movie_selected_cover_label.configure(text="Movie Cover Selected!")
 
     def select_movie_medias_handler(self):
         self.movie_medias = filedialog.askopenfilenames()
+        self.movie_medias = self.movie_medias if self.movie_medias else None
+        if self.movie_medias is not None:
+            self.selected_movie_medias_count_label.configure(text="Movie Medias Selected!")
 
     def search_cast_handler(self):
         from api_services.cast import search_cast
-        self.cast_search_result = search_cast(self.search_cast_name_entry.input.get().split(' - ')[0])
-        if self.cast_search_result['ok']:
-            self.update_searched_casts_table(self.cast_search_result['result'])
+        cast_search_result = search_cast(self.search_cast_name_entry.input.get().split(' - ')[0])
+        if cast_search_result['ok']:
+            self.update_searched_casts_table(cast_search_result['result'])
         else:
-            CTkMessagebox(title='Error', message=self.cast_search_result['message'], icon='cancel')
-
-    def update_searched_casts_table(self, search_result):
-        for check_button in self.cast_results_check_buttons:
-            check_button.grid_forget()
-        self.cast_results_var = []
-        self.cast_results_check_buttons = []
-
-        for index, item in enumerate(search_result):
-            var = ctk.BooleanVar()
-            check_button = ctk.CTkCheckBox(self.cast_result_box, text=item['fullName'], variable=var, width=160, command=self.handle_adding_cast)
-            check_button.grid(row=index, column=0, sticky='w', padx=20, pady=10)
-            self.cast_results_var.append((var, item['_id'], item['fullName'], self.search_cast_name_entry.input.get().split(' - ')[2]))
-            self.cast_results_check_buttons.append(check_button)
-
-    def handle_adding_cast(self):
-        for var, cast_id, *rest in self.cast_results_var:
-            target_obj = {"castId": cast_id,
-                                 "inMovieName": self.search_cast_name_entry.input.get().split(' - ')[1],
-                                 "inMovieRole": self.search_cast_name_entry.input.get().split(' - ')[2]}
-            if var.get() and target_obj not in self.movie_casts:
-                self.movie_casts.append(target_obj)
-        self.update_movie_selected_cast_box()
-
-    def update_movie_selected_cast_box(self):
-        self.cast_selected_box.configure(state='normal')
-        for var, cast_id, full_name, role in self.cast_results_var:
-            if var.get():
-                self.cast_selected_box.insert(ctk.END, f'{full_name} - {role}\n')
-        self.cast_selected_box.configure(state='disabled')
+            CTkMessagebox(title='Error', message=cast_search_result['message'], icon='cancel')
 
     def handle_creating_movie(self, isPublished):
         from api_services.movies import create_movie
@@ -623,6 +599,59 @@ class AdminDashboard(ctk.CTkFrame):
             self.update_all_movies_table()
         else:
             CTkMessagebox(title='Error', message=create_result['message'], icon='cancel')
+
+    def update_searched_casts_table(self, data):
+        for check_button in self.cast_results_check_buttons:
+            check_button.grid_forget()
+        self.cast_results_check_buttons = []
+
+        for index, item in enumerate(data):
+            var = ctk.BooleanVar()
+            check_button = ctk.CTkCheckBox(self.cast_result_box, text=f"{item['fullName']}", variable=var, width=160,
+                                           command=lambda idx=index: self.handle_adding_cast(adding_index=idx, data=data))
+            check_button.grid(row=index, column=0, sticky='w', padx=20, pady=10)
+            self.cast_results_check_buttons.append(check_button)
+
+        if not len(data):
+            label = ctk.CTkLabel(self.cast_result_box, text="No results found")
+            label.grid(row=0, column=0, sticky='ew')
+            self.cast_results_check_buttons.append(label)
+
+    def handle_adding_cast(self, adding_index, data):
+        self.movie_casts.append({
+            "castId": data[adding_index]['_id'],
+            "inMovieName": self.search_cast_name_entry.input.get().split(" - ")[1],
+            "inMovieRole": self.search_cast_name_entry.input.get().split(" - ")[2]
+        })
+        self.duplicate_movie_casts.append({
+            "fullName": data[adding_index]['fullName'],
+            "inMovieRole": self.search_cast_name_entry.input.get().split(" - ")[2]
+        })
+        self.update_movie_selected_cast_box()
+
+    def update_movie_selected_cast_box(self):
+        for widget in self.cast_selected_check_buttons:
+            widget.grid_forget()
+        self.cast_selected_check_buttons = []
+
+        for index, item in enumerate(self.duplicate_movie_casts):
+            var = ctk.BooleanVar()
+            var.set(True)
+            check_button = ctk.CTkCheckBox(self.cast_selected_box,
+                                           text=f"{item['fullName']} - {item['inMovieRole']}", variable=var,
+                                           width=160,
+                                           command=lambda idx=index: self.handle_deleting_cast(deleting_index=idx))
+            check_button.grid(row=index, column=0, sticky='w', padx=20, pady=10)
+            self.cast_selected_check_buttons.append(check_button)
+        if not len(self.duplicate_movie_casts):
+            label = ctk.CTkLabel(self.cast_result_box, text="No cast found")
+            label.grid(row=0, column=0, sticky='ew')
+            self.cast_selected_check_buttons.append(label)
+
+    def handle_deleting_cast(self, deleting_index):
+        del self.movie_casts[deleting_index]
+        del self.duplicate_movie_casts[deleting_index]
+        self.update_movie_selected_cast_box()
 
     def update_all_movies_table(self, search_result=None):
         from api_services.movies import get_all_movies
@@ -685,8 +714,8 @@ class AdminDashboard(ctk.CTkFrame):
                 else:
                     CTkMessagebox(title='Error', message='Failed To Change Movie Status!', icon='cancel')
             elif column == 5:
-                # handle edit movie
-                pass
+                from modules.editMovieModal import EditMovieModal
+                EditMovieModal(self, movie_id=self.all_movies[row - 1]['_id'])
             elif column == 6:
                 from api_services.movies import delete_movie_by_id
                 delete_result = delete_movie_by_id(self.all_movies[row - 1]['_id'])
