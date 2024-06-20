@@ -12,7 +12,7 @@ class LoginForm(ctk.CTkFrame):
         self.configure(fg_color=master.cget("bg"))
 
         # page title
-        self.middle_page_title = ctk.CTkLabel(self, text="LOG IN ", font=("Arial", 36, 'italic'))
+        self.middle_page_title = ctk.CTkButton(self, text="LOG IN ", font=("Arial", 36, 'italic'), fg_color='transparent', hover_color=self.cget('fg_color'), command=self.switch_to_main_page)
         self.middle_page_title.grid(row=0, column=0)
 
         # identifier field entry input
@@ -45,10 +45,6 @@ class LoginForm(ctk.CTkFrame):
         # load sign up page contents
         SignUpForm(master=self.master).grid(column=0, row=0)
 
-    def switch_to_otp_page(self):
-        # destroy current page content
-        self.destroy()
-
     def login_handler(self):
         from api_services.auth import login
         from modules.otpForm import OTPForm
@@ -61,3 +57,12 @@ class LoginForm(ctk.CTkFrame):
             OTPForm(master=self.master, identifier=identifier, password=password, operation='login').grid(column=0, row=0)
         else:
             CTkMessagebox(title='Error', message=login_result['message'], icon='cancel')
+
+    def switch_to_main_page(self):
+        from mainScrollableFrame import MainScrollableFrame
+
+        # destroy current page content
+        self.destroy()
+
+        MainScrollableFrame(master=self.master).grid(row=0, column=0, sticky='nsew')
+

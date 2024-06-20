@@ -10,7 +10,7 @@ class SignUpForm(ctk.CTkFrame):
         self.configure(fg_color=master.cget("bg"))
 
         # page title
-        self.middle_page_title = ctk.CTkLabel(self, text="SIGN UP ", font=("Arial", 36, 'italic'))
+        self.middle_page_title = ctk.CTkButton(self, text="SIGN UP ", font=("Arial", 36, 'italic'), fg_color='transparent', hover_color=self.cget('fg_color'), command=self.switch_to_main_page)
         self.middle_page_title.grid(row=0, column=0)
 
         # full name field entry input
@@ -81,3 +81,11 @@ class SignUpForm(ctk.CTkFrame):
                     role=role, operation='signup').grid(column=0, row=0)
         else:
             CTkMessagebox(title='Error', message=sign_up_result['message'], icon='cancel')
+
+    def switch_to_main_page(self):
+        from mainScrollableFrame import MainScrollableFrame
+
+        # destroy current page content
+        self.destroy()
+
+        MainScrollableFrame(master=self.master).grid(row=0, column=0, sticky='nsew')

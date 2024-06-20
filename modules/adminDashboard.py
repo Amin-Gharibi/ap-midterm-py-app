@@ -231,6 +231,11 @@ class AdminDashboard(ctk.CTkFrame):
 
     def handle_creating_user(self):
         from api_services.auth import admin_register_user
+
+        if not self.full_name_entry.input.get() or not self.username_entry.input.get() or not self.email_entry.input.get() or not self.password_entry.input.get() or not self.role_entry.get():
+            CTkMessagebox(title='Error', message='User Fields Can Not Be Empty!', icon='cancel')
+            return None
+
         create_result = admin_register_user(
             fullName=self.full_name_entry.input.get(),
             username=self.username_entry.input.get(),
@@ -588,6 +593,11 @@ class AdminDashboard(ctk.CTkFrame):
 
     def handle_creating_movie(self, isPublished):
         from api_services.movies import create_movie
+
+        if not self.movie_name_entry.input.get() or not self.movie_summary_entry.get("1.0", ctk.END) or not self.movie_genre_entry.input.get() or not self.movie_release_date_entry.input.get() or not self.movie_countries_entry.input.get() or not self.movie_language_entry.input.get() or not self.movie_budget_entry.input.get() or not self.movie_cover or not self.movie_medias or not self.movie_casts:
+            CTkMessagebox(title='Error', message="Movie Fields Can Not Be Empty!")
+            return None
+
         create_result = create_movie(
             fullName=self.movie_name_entry.input.get(),
             summary=self.movie_summary_entry.get("1.0", ctk.END),
@@ -946,6 +956,11 @@ class AdminDashboard(ctk.CTkFrame):
 
     def handle_creating_cast(self):
         from api_services.cast import create_cast
+
+        if not self.cast_name_entry.input.get() or not self.cast_bio_input.get("1.0", ctk.END) or not self.cast_birth_date_entry.input.get() or not self.cast_birth_place_entry.input.get() or not self.cast_height_entry.input.get() or not self.cast_profile_pic or not self.cast_page_photos:
+            CTkMessagebox(title='Error', message="Cast Fields Can Not Be Emtpy!", icon='cancel')
+            return None
+
         create_result = create_cast(
             fullName=self.cast_name_entry.input.get(),
             biography=self.cast_bio_input.get("1.0", ctk.END),
