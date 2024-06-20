@@ -21,7 +21,8 @@ class HeaderNavBar(ctk.CTkFrame):
         self.data = get_me()
 
         # application signup / login button
-        self.signInButton = ctk.CTkButton(self, text=(self.data and self.data['user']['fullName']) or "Sign Up / Login", height=30,
+        self.signInButton = ctk.CTkButton(self, text=(self.data and self.data['user']['fullName']) or "Sign Up / Login",
+                                          height=30,
                                           font=("Arial", 16),
                                           command=self.on_btn_click_handler)
         self.signInButton.pack(side=tk.RIGHT,
@@ -31,7 +32,7 @@ class HeaderNavBar(ctk.CTkFrame):
         # go to movies only page button
         self.goToMoviesButton = ctk.CTkButton(self, text="Movies", width=80,
                                               fg_color='transparent', hover_color=self.cget('fg_color'),
-                                              font=("Arial", 18), cursor='hand2')
+                                              font=("Arial", 18), cursor='hand2', command=self.go_to_all_movies_page_handler)
         self.goToMoviesButton.pack(side=tk.RIGHT,
                                    padx=10, pady=20,
                                    anchor='n')
@@ -43,6 +44,14 @@ class HeaderNavBar(ctk.CTkFrame):
         self.goToArticlesButton.pack(side=tk.RIGHT,
                                      padx=0, pady=20,
                                      anchor='n')
+
+        # go to casts only page button
+        self.goToCastsPageButton = ctk.CTkButton(self, text="Casts", width=80,
+                                                 fg_color='transparent', hover_color=self.cget('fg_color'),
+                                                 font=("Arial", 18), cursor='hand2')
+        self.goToCastsPageButton.pack(side=tk.RIGHT,
+                                      padx=0, pady=20,
+                                      anchor='n')
 
     def on_btn_click_handler(self):
         # because the . layout in each page is different, so I get the count that gets me to . and loop over it
@@ -96,3 +105,21 @@ class HeaderNavBar(ctk.CTkFrame):
 
     def get_fg_color(self):
         return self.cget('fg_color')
+
+
+    def go_to_all_movies_page_handler(self):
+        from modules.allMoviesPage import AllMoviesPage
+        parent = None
+
+        # because the . layout in each page is different so i get the count that gets me to . and loop over it
+        for i in range(self.parent_count):
+            if parent:
+                parent = parent.master
+            else:
+                parent = self.master
+
+        # destroy current contents
+        for widget in parent.winfo_children():
+            widget.destroy()
+
+        AllMoviesPage(parent).grid(column=0, row=0, sticky='nsew')

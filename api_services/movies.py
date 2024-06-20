@@ -151,7 +151,7 @@ def change_movie_status_by_id(movie_id: str):
         return None
 
 
-def search_in_movies(q: str):
+def search_in_movies(q: str, filter: str = None):
     try:
         headers = None
         if get_access_token():
@@ -159,7 +159,7 @@ def search_in_movies(q: str):
                 'Authorization': f'Bearer {get_access_token()}'
             }
 
-        res = req.get(f'{getenv("BASE_URL")}/movie/search?q={q}', headers=headers)
+        res = req.get(f'{getenv("BASE_URL")}/movie/search?q={q}{f'&filter={filter}' if filter is not None else ''}', headers=headers)
 
         return {**res.json(), "ok": res.ok}
     except Exception as e:
