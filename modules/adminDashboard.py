@@ -298,9 +298,9 @@ class AdminDashboard(ctk.CTkFrame):
     def update_all_users_table(self, search_result=None):
         from api_services.user import get_all_users
 
-        self.all_users = search_result if search_result else get_all_users()
+        self.all_users = search_result if search_result is not None else get_all_users()
 
-        if not search_result and self.all_users['ok']:
+        if search_result is None and self.all_users['ok']:
             self.all_users = self.all_users['users']
 
         values = [
@@ -538,9 +538,9 @@ class AdminDashboard(ctk.CTkFrame):
         SectionTitle(temp_frame, text='All Movies').pack(padx=30, side=tkinter.LEFT)
         search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
         search_box_frame.pack(padx=30, side=tkinter.RIGHT)
-        search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
-        search_box_entry.grid(row=0, column=0, padx=10)
-        ctk.CTkButton(search_box_frame, text='Go!', width=60).grid(row=0, column=1)
+        self.movie_search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
+        self.movie_search_box_entry.grid(row=0, column=0, padx=10)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60, command=self.handle_searching_in_movies).grid(row=0, column=1)
         self.all_movies_table = None
         self.movies_not_found_label = None
         if len(all_movies_values) > 1:
@@ -557,6 +557,14 @@ class AdminDashboard(ctk.CTkFrame):
                                                        font=('Arial', 16, 'italic'),
                                                        text_color='gray')
             self.movies_not_found_label.pack()
+
+    def handle_searching_in_movies(self):
+        from api_services.movies import search_in_movies
+        search_result = search_in_movies(self.movie_search_box_entry.get())
+        if search_result['ok']:
+            self.update_all_movies_table(search_result=search_result['result'])
+        else:
+            CTkMessagebox(title='Error', message='Failed To Search In Movies', icon='cancel')
 
     def select_movie_cover_handler(self):
         self.movie_cover = filedialog.askopenfilename()
@@ -656,9 +664,9 @@ class AdminDashboard(ctk.CTkFrame):
     def update_all_movies_table(self, search_result=None):
         from api_services.movies import get_all_movies
 
-        self.all_movies = search_result if search_result else get_all_movies()
+        self.all_movies = search_result if search_result is not None else get_all_movies()
 
-        if not search_result and self.all_movies['ok']:
+        if search_result is None and self.all_movies['ok']:
             self.all_movies = self.all_movies['allMovies']
 
         values = [
@@ -830,7 +838,12 @@ class AdminDashboard(ctk.CTkFrame):
         self.all_casts_frame.grid(row=1, column=0, columnspan=2, sticky='ew', pady=20)
         temp_frame = ctk.CTkFrame(self.all_casts_frame, fg_color='transparent')
         temp_frame.pack(expand=True, fill='x')
-        SectionTitle(temp_frame, text='All Casts').pack(padx=30, side=tkinter.LEFT)
+        SectionTitle(temp_frame, text='All Casts').pack(padx=30, side=ctk.LEFT)
+        search_box_frame = ctk.CTkFrame(temp_frame, fg_color='transparent')
+        search_box_frame.pack(padx=30, side=tkinter.RIGHT)
+        self.cast_search_box_entry = ctk.CTkEntry(search_box_frame, placeholder_text='Search here...', width=200)
+        self.cast_search_box_entry.grid(row=0, column=0, padx=10)
+        ctk.CTkButton(search_box_frame, text='Go!', width=60, command=self.handle_searching_in_casts).grid(row=0, column=1)
         self.all_casts_table = None
         self.cast_not_found_label = None
         if len(all_casts_list) > 1:
@@ -848,11 +861,19 @@ class AdminDashboard(ctk.CTkFrame):
                                                      text_color='gray')
             self.cast_not_found_label.pack()
 
-    def update_all_casts_table(self):
+    def handle_searching_in_casts(self):
+        from api_services.cast import search_cast
+        search_result = search_cast(self.cast_search_box_entry.get())
+        if search_result['ok']:
+            self.update_all_casts_table(search_result=search_result['result'])
+        else:
+            CTkMessagebox(title='Error', message='Failed To Search In Cast', icon='cancel')
+
+    def update_all_casts_table(self, search_result=None):
         from api_services.cast import get_all_casts
 
-        self.all_casts = get_all_casts()
-        if self.all_casts['ok']:
+        self.all_casts = search_result if search_result is not None else get_all_casts()
+        if search_result is None and self.all_casts['ok']:
             self.all_casts = self.all_casts['allCast']
 
         all_casts_list = [
@@ -1007,7 +1028,10 @@ class AdminDashboard(ctk.CTkFrame):
     def handle_searching_in_articles(self):
         from api_services.articles import search_in_articles
         search_result = search_in_articles(q=self.search_in_articles_entry.get())
-        self.update_all_articles_table(search_result=search_result['result'])
+        if search_result['ok']:
+            self.update_all_articles_table(search_result=search_result['result'])
+        else:
+            CTkMessagebox(title='Error', message='Failed To Search In Articles', icon='cancel')
 
     def handle_articles_funcs(self, *args):
         row = args[0]['row']
@@ -1029,8 +1053,8 @@ class AdminDashboard(ctk.CTkFrame):
     def update_all_articles_table(self, search_result=None):
         from api_services.articles import get_all_articles
 
-        self.all_articles = search_result if search_result else get_all_articles()
-        if not search_result and self.all_articles['ok']:
+        self.all_articles = search_result if search_result is not None else get_all_articles()
+        if search_result is None and self.all_articles['ok']:
             self.all_articles = self.all_articles['allArticles']
 
         all_articles_list = [
@@ -1061,7 +1085,7 @@ class AdminDashboard(ctk.CTkFrame):
                                                not_hover_rows=[0])
             self.all_articles_table.pack(expand=True, fill='both', pady=(10, 0), padx=20)
         else:
-            self.article_not_found_label = ctk.CTkLabel(self.all_casts_frame,
+            self.article_not_found_label = ctk.CTkLabel(self.all_articles_frame,
                                                         text='No Articles Yet...',
                                                         font=('Arial', 16, 'italic'),
                                                         text_color='gray')
