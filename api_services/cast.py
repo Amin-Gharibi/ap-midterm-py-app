@@ -113,9 +113,9 @@ def delete_cast(cast_id: str):
         return error_handler(e)
 
 
-def search_cast(q: str):
+def search_cast(q: str, filter: str = None):
     try:
-        res = req.get(f"{getenv('BASE_URL')}/cast/search?q={q}")
+        res = req.get(f"{getenv('BASE_URL')}/cast/search?q={q}{f'&filter={filter}' if filter is not None else ''}")
 
         return {**res.json(), "ok": res.ok}
     except Exception as e:

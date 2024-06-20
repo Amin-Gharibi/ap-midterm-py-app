@@ -32,7 +32,7 @@ class HeaderNavBar(ctk.CTkFrame):
         # go to movies only page button
         self.goToMoviesButton = ctk.CTkButton(self, text="Movies", width=80,
                                               fg_color='transparent', hover_color=self.cget('fg_color'),
-                                              font=("Arial", 18), cursor='hand2', command=self.go_to_all_movies_page_handler)
+                                              font=("Arial", 18), cursor='hand2', command=lambda: self.go_to_all_one_type_page('movie'))
         self.goToMoviesButton.pack(side=tk.RIGHT,
                                    padx=10, pady=20,
                                    anchor='n')
@@ -40,7 +40,7 @@ class HeaderNavBar(ctk.CTkFrame):
         # go to articles only page button
         self.goToArticlesButton = ctk.CTkButton(self, text="Articles", width=80,
                                                 fg_color='transparent', hover_color=self.cget('fg_color'),
-                                                font=("Arial", 18), cursor='hand2')
+                                                font=("Arial", 18), cursor='hand2', command=lambda: self.go_to_all_one_type_page('article'))
         self.goToArticlesButton.pack(side=tk.RIGHT,
                                      padx=0, pady=20,
                                      anchor='n')
@@ -48,7 +48,7 @@ class HeaderNavBar(ctk.CTkFrame):
         # go to casts only page button
         self.goToCastsPageButton = ctk.CTkButton(self, text="Casts", width=80,
                                                  fg_color='transparent', hover_color=self.cget('fg_color'),
-                                                 font=("Arial", 18), cursor='hand2')
+                                                 font=("Arial", 18), cursor='hand2', command=lambda: self.go_to_all_one_type_page('cast'))
         self.goToCastsPageButton.pack(side=tk.RIGHT,
                                       padx=0, pady=20,
                                       anchor='n')
@@ -107,11 +107,10 @@ class HeaderNavBar(ctk.CTkFrame):
         return self.cget('fg_color')
 
 
-    def go_to_all_movies_page_handler(self):
-        from modules.allMoviesPage import AllMoviesPage
+    def go_to_all_one_type_page(self, page_type):
+        from modules.allOneTypePage import AllOneTypePage
         parent = None
-
-        # because the . layout in each page is different so i get the count that gets me to . and loop over it
+        # because the . layout in each page is different, so I get the count that gets me to . and loop over it
         for i in range(self.parent_count):
             if parent:
                 parent = parent.master
@@ -122,4 +121,35 @@ class HeaderNavBar(ctk.CTkFrame):
         for widget in parent.winfo_children():
             widget.destroy()
 
-        AllMoviesPage(parent).grid(column=0, row=0, sticky='nsew')
+        get_all_items_func = None
+        get_all_items_param = None
+        search_func = None
+        page_title = None
+        items_details_page = None
+        if page_type == 'movie':
+            from api_services.movies import get_all_movies, search_in_movies
+            from modules.moviePage import MoviePage
+            get_all_items_func = get_all_movies
+            get_all_items_param = 'allMovies'
+            search_func = search_in_movies
+            page_title = 'Movies'
+            items_details_page = MoviePage
+        elif page_type == 'article':
+            from api_services.articles import get_all_published_articles, search_in_articles
+            from modules.articlePage import ArticlePage
+            get_all_items_func = get_all_published_articles
+            get_all_items_param = 'publishedArticles'
+            search_func = search_in_articles
+            page_title = 'Articles'
+            items_details_page = ArticlePage
+        elif page_type == 'cast':
+            from api_services.cast import get_all_casts, search_cast
+            from modules.castPage import CastPage
+            get_all_items_func = get_all_casts
+            get_all_items_param = 'allCast'
+            search_func = search_cast
+            page_title = 'Casts'
+            items_details_page = CastPage
+
+        AllOneTypePage(parent, get_all_items_func, get_all_items_param, search_func, page_title, items_details_page).grid(row=0, column=0, sticky='nsew')
+

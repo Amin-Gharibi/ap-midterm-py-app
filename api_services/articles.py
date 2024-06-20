@@ -139,7 +139,7 @@ def change_article_status(article_id: str):
         return None
 
 
-def search_in_articles(q: str = ""):
+def search_in_articles(q: str, filter: str = None):
     try:
         headers = None
         if get_access_token():
@@ -147,7 +147,7 @@ def search_in_articles(q: str = ""):
                 "Authorization": f"Bearer {get_access_token()}"
             }
 
-        res = req.get(f"{getenv('BASE_URL')}/article/search?q={q}", headers=headers)
+        res = req.get(f"{getenv('BASE_URL')}/article/search?q={q}{f'&filter={filter}' if filter is not None else ''}", headers=headers)
 
         return {**res.json(), "ok": res.ok}
     except Exception as e:
