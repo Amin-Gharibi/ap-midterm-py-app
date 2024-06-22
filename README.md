@@ -36,13 +36,17 @@ To use this application, follow these steps:
 
 1. Clone or download the backend side of the project from [here](https://github.com/Amin-Gharibi/ap-midterm-backend) and run the server. A tutorial on running the server is available on the backend page.
 2. Ensure Redis is installed on your system and run the Redis server.
-3. Navigate to the frontend folder and create a `.env` file with the following fields:
+3. Navigate to the frontend folder and run this command to install all project requirements:
+   ```plaintext
+   pip install -r requirements.txt
+   ```
+4. Then in frontend folder create a `.env` file with the following fields:
     ```plaintext
     BASE_URL=<COMMON-PART-OF-THE-BACKEND-APIS e.g., http://localhost:3000/api>
     REDIS_HOST=<REDIS HOST e.g., localhost>
     REDIS_PORT=<REDIS PORT e.g., 6379>
     ```
-4. Run `main.py`.
+5. Run `main.py`.
 
 Done!
 

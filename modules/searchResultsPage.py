@@ -12,10 +12,14 @@ class SearchResultsPage(ctk.CTkScrollableFrame):
         super().__init__(master, *args, **kwargs)
 
         self.searching_text = searching_text
-        results = universal_search(self.searching_text)
-        self.movie_results = results['movies']
-        self.article_results = results['articles']
-        self.cast_results = results['castUsers']
+        self.movie_results = []
+        self.article_results = []
+        self.cast_results = []
+        if self.searching_text:
+            results = universal_search(self.searching_text)
+            self.movie_results = results['movies']
+            self.article_results = results['articles']
+            self.cast_results = results['castUsers']
 
         self.configure(fg_color=self.cget('bg_color'))
         self.grid_columnconfigure(0, weight=1)

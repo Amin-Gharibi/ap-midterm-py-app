@@ -594,7 +594,7 @@ class AdminDashboard(ctk.CTkFrame):
     def handle_creating_movie(self, isPublished):
         from api_services.movies import create_movie
 
-        if not self.movie_name_entry.input.get() or not self.movie_summary_entry.get("1.0", ctk.END) or not self.movie_genre_entry.input.get() or not self.movie_release_date_entry.input.get() or not self.movie_countries_entry.input.get() or not self.movie_language_entry.input.get() or not self.movie_budget_entry.input.get() or not self.movie_cover or not self.movie_medias or not self.movie_casts:
+        if not self.movie_name_entry.input.get() or not self.movie_summary_entry.get("1.0", ctk.END) or not self.movie_genre_entry.input.get() or not self.movie_release_date_entry.input.get() or not self.movie_countries_entry.input.get() or not self.movie_language_entry.input.get() or not self.movie_budget_entry.input.get() or not self.movie_cover or not self.movie_medias:
             CTkMessagebox(title='Error', message="Movie Fields Can Not Be Empty!")
             return None
 

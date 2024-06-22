@@ -6,9 +6,7 @@ from modules.userDashboard import UserDashboard
 from modules.adminDashboard import AdminDashboard
 from api_services.auth import login, validate_login_otp
 
-# app width and height and other static variables
-APP_WIDTH = 1200
-APP_HEIGHT = 700
+# static variables
 APPEARANCE_MODE = 'dark'
 COLOR_THEME = 'green'
 
@@ -27,8 +25,8 @@ class App(ctk.CTk):
 
         # set application title
         self.title("IMDB M.M.")
-        # set application sizes
-        self.geometry(f"{APP_WIDTH}x{APP_HEIGHT}")
+        # make application full size
+        self.geometry(f"{self.winfo_screenwidth()}x{self.winfo_screenheight()}+0+0")
 
         # config the column that the header navbar is in it
         self.grid_columnconfigure(0, weight=1)
